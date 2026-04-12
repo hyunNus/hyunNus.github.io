@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIL | Self-Refining Engine</title>
+  <meta name="description" content="Today I Learned — AI 개발, 논문 리뷰, 스택 정리">
+  <link rel="stylesheet" href="../../assets/css/pixel-system.css">
+  <link rel="stylesheet" href="../../assets/css/til.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231a1a2e'/><rect x='8' y='8' width='16' height='16' fill='%2300d4ff'/><rect x='12' y='12' width='8' height='8' fill='%231a1a2e'/></svg>">
+</head>
+<body class="grid-bg">
+
+  <!-- 네비게이션 -->
+  <nav class="nav-pixel">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo">SRE<span>.</span>dev</a>
+      <button class="nav-menu-btn">MENU</button>
+      <ul class="nav-links">
+        <li><a href="../../index.html">HOME</a></li>
+        <li><a href="index.html">TIL</a></li>
+        <li><a href="../life-os/index.html">LIFE OS</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main style="padding-top:70px;position:relative;z-index:1;">
+
+    <!-- ── PAGE HEADER ── -->
+    <div class="til-page-header">
+      <div class="til-header-inner">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+            <span class="pixel-tag tag-dev blink">● LIVE</span>
+            <span class="font-pixel text-muted" style="font-size:7px;" id="til-count-label">0 ENTRIES</span>
+          </div>
+          <h1 style="margin-bottom:8px;">TODAY I LEARNED</h1>
+          <p style="font-size:20px;">개발 · 논문 · 스택 — 매일 한 가지씩 배우고 기록한다</p>
+        </div>
+        <button class="btn-pixel btn-cyan" id="btn-new-til" onclick="openNewTILModal()">
+          + NEW TIL
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+
+      <!-- ── FILTER BAR ── -->
+      <div class="til-filter-bar">
+        <div class="filter-categories">
+          <button class="btn-pixel btn-cyan active" data-filter="all">ALL</button>
+          <button class="btn-pixel btn-cyan" data-filter="dev">◉ DEV</button>
+          <button class="btn-pixel" data-filter="paper" style="color:var(--accent-purple);border-color:var(--accent-purple);">◇ PAPER</button>
+          <button class="btn-pixel btn-green" data-filter="stack">◆ STACK</button>
+        </div>
+        <div class="filter-right">
+          <input type="text" class="pixel-input" id="til-search" placeholder="검색..." style="width:200px;font-size:16px;">
+          <select class="pixel-select" id="til-sort">
+            <option value="date-desc">최신순</option>
+            <option value="date-asc">오래된순</option>
+            <option value="xp-desc">XP 높은순</option>
+            <option value="difficulty">난이도순</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── CATEGORY STATS ── -->
+      <div class="til-cat-stats reveal">
+        <div class="cat-stat-card" data-filter-trigger="dev">
+          <div class="cat-stat-icon text-cyan">◉</div>
+          <div class="cat-stat-info">
+            <span class="cat-stat-num text-cyan" id="count-dev">0</span>
+            <span class="cat-stat-label">DEV</span>
+          </div>
+          <div class="pixel-progress" style="margin-top:8px;">
+            <div class="pixel-progress-fill cyan" id="bar-dev" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="cat-stat-card" data-filter-trigger="paper">
+          <div class="cat-stat-icon text-purple">◇</div>
+          <div class="cat-stat-info">
+            <span class="cat-stat-num text-purple" id="count-paper">0</span>
+            <span class="cat-stat-label">PAPER</span>
+          </div>
+          <div class="pixel-progress" style="margin-top:8px;">
+            <div class="pixel-progress-fill" id="bar-paper" style="width:0%;background:repeating-linear-gradient(90deg,var(--accent-purple) 0,var(--accent-purple) 8px,transparent 8px,transparent 10px);"></div>
+          </div>
+        </div>
+        <div class="cat-stat-card" data-filter-trigger="stack">
+          <div class="cat-stat-icon text-orange">◆</div>
+          <div class="cat-stat-info">
+            <span class="cat-stat-num text-orange" id="count-stack">0</span>
+            <span class="cat-stat-label">STACK</span>
+          </div>
+          <div class="pixel-progress" style="margin-top:8px;">
+            <div class="pixel-progress-fill" id="bar-stack" style="width:0%;background:repeating-linear-gradient(90deg,var(--accent-orange) 0,var(--accent-orange) 8px,transparent 8px,transparent 10px);"></div>
+          </div>
+        </div>
+        <div class="cat-stat-card">
+          <div class="cat-stat-icon text-gold">◈</div>
+          <div class="cat-stat-info">
+            <span class="cat-stat-num text-gold" id="count-total-xp">0</span>
+            <span class="cat-stat-label">TOTAL XP</span>
+          </div>
+          <div class="pixel-progress" style="margin-top:8px;">
+            <div class="pixel-progress-fill gold" style="width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TIL GRID ── -->
+      <div id="til-grid" class="til-grid">
+        <!-- JS로 렌더링 -->
+      </div>
+
+      <!-- 빈 상태 -->
+      <div id="til-empty" class="til-empty hidden">
+        <div class="font-pixel text-muted" style="font-size:24px;margin-bottom:16px;">░░░</div>
+        <p class="font-pixel" style="font-size:9px;color:var(--text-muted);">NO ENTRIES FOUND</p>
+        <p style="font-size:16px;color:var(--text-muted);margin-top:8px;">검색 결과가 없습니다</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── NEW TIL MODAL ── -->
+  <div class="pixel-modal-overlay" id="modal-new-til">
+    <div class="pixel-modal">
+      <button class="pixel-modal-close" onclick="closeModal('modal-new-til')">✕</button>
+      <h2 style="margin-bottom:var(--gap-lg);">+ NEW TIL ENTRY</h2>
+
+      <div class="form-group">
+        <label class="form-label">TITLE</label>
+        <input type="text" class="pixel-input" id="new-til-title" placeholder="오늘 배운 것의 제목">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CATEGORY</label>
+        <div class="cat-select-group">
+          <button class="btn-pixel btn-cyan cat-btn active" data-cat="dev">◉ DEV</button>
+          <button class="btn-pixel cat-btn" data-cat="paper" style="color:var(--accent-purple);border-color:var(--accent-purple);">◇ PAPER</button>
+          <button class="btn-pixel btn-green cat-btn" data-cat="stack">◆ STACK</button>
+        </div>
+        <input type="hidden" id="new-til-category" value="dev">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">TAGS <span class="text-muted" style="font-size:14px;">(쉼표로 구분)</span></label>
+        <input type="text" class="pixel-input" id="new-til-tags" placeholder="Python, ML, NLP">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CONTENT</label>
+        <textarea class="pixel-input" id="new-til-content" rows="5" placeholder="오늘 배운 내용을 자유롭게 기록하세요..." style="resize:vertical;"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">DIFFICULTY</label>
+          <div class="difficulty-select" id="difficulty-select">
+            <span class="diff-star" data-val="1">★</span>
+            <span class="diff-star" data-val="2">★</span>
+            <span class="diff-star" data-val="3">★</span>
+            <span class="diff-star" data-val="4">★</span>
+            <span class="diff-star" data-val="5">★</span>
+          </div>
+          <input type="hidden" id="new-til-difficulty" value="3">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">DATE</label>
+          <input type="date" class="pixel-input" id="new-til-date">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--gap-md);margin-top:var(--gap-lg);">
+        <button class="btn-pixel btn-cyan w-full" onclick="saveTIL()">SAVE +XP</button>
+        <button class="btn-pixel w-full" onclick="closeModal('modal-new-til')">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TIL DETAIL MODAL ── -->
+  <div class="pixel-modal-overlay" id="modal-til-detail">
+    <div class="pixel-modal">
+      <button class="pixel-modal-close" onclick="closeModal('modal-til-detail')">✕</button>
+      <div id="til-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="footer-pixel">
+    <p>SELF-REFINING ENGINE © 2025 · <a href="../../index.html">HOME</a> · <a href="../life-os/index.html">LIFE OS</a></p>
+  </footer>
+
+  <button class="scroll-top">▲</button>
+
+  <script src="../../assets/js/pixel-core.js"></script>
+  <script src="../../assets/js/pixel-effects.js"></script>
+  <script src="../../assets/js/til.js"></script>
+</body>
+</html>

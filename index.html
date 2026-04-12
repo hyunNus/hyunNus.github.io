@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRE | Self-Refining Engine</title>
+  <meta name="description" content="AI 데이터 개발자의 기술 블로그 & Life OS — Self-Refining Engine">
+  <meta property="og:title" content="SRE | Self-Refining Engine">
+  <meta property="og:description" content="AI 데이터 개발자의 픽셀아트 개인 대시보드">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="assets/css/pixel-system.css">
+  <link rel="stylesheet" href="assets/css/home.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231a1a2e'/><rect x='8' y='8' width='16' height='16' fill='%23ffd700'/><rect x='12' y='12' width='8' height='8' fill='%231a1a2e'/></svg>">
+</head>
+<body class="grid-bg">
+
+  <!-- SVG 스프라이트 -->
+  <div style="display:none;" id="svg-sprites"></div>
+
+  <!-- 배경 캔버스 -->
+  <canvas id="bg-canvas" style="position:fixed;top:0;left:0;z-index:0;pointer-events:none;"></canvas>
+
+  <!-- 네비게이션 -->
+  <nav class="nav-pixel">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">SRE<span>.</span>dev</a>
+      <button class="nav-menu-btn">MENU</button>
+      <ul class="nav-links">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="pages/til/index.html">TIL</a></li>
+        <li><a href="pages/life-os/index.html">LIFE OS</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- 메인 콘텐츠 -->
+  <main style="position:relative;z-index:1;padding-top:70px;">
+
+    <!-- ── HERO SECTION ── -->
+    <section class="hero-section scanlines">
+      <div class="hero-inner">
+        <div class="hero-avatar-wrap">
+          <div class="hero-avatar pixel-sprite float">
+            <div class="avatar-pixel-art">
+              <!-- 픽셀아트 캐릭터 (CSS) -->
+              <div class="px-head"></div>
+              <div class="px-face">
+                <div class="px-eye left"></div>
+                <div class="px-eye right"></div>
+                <div class="px-mouth"></div>
+              </div>
+              <div class="px-body">
+                <div class="px-badge">AI</div>
+              </div>
+              <div class="px-legs">
+                <div class="px-leg left"></div>
+                <div class="px-leg right"></div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-level-badge">
+            <div class="level-badge glow-pulse">
+              <span class="lv">LV.</span>
+              <span class="player-level">1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-content">
+          <div class="hero-greeting">
+            <span class="pixel-tag tag-new blink">● ONLINE</span>
+          </div>
+          <h1 class="hero-title">
+            SELF-REFINING<br>
+            <span class="text-cyan">ENGINE</span>
+          </h1>
+          <p class="hero-subtitle">
+            AI Data Developer · Researcher · Builder<br>
+            <span class="text-gold">끊임없이 자기 자신을 개선하는 엔진</span>
+          </p>
+
+          <!-- XP Bar -->
+          <div class="xp-container" style="margin-top:16px;max-width:400px;">
+            <span class="xp-label">XP</span>
+            <div class="xp-bar">
+              <div class="xp-fill" style="width:0%"></div>
+            </div>
+            <span class="xp-current">0</span><span style="font-size:8px;color:var(--text-muted)">/100</span>
+          </div>
+
+          <div class="hero-actions">
+            <a href="pages/til/index.html" class="btn-pixel btn-cyan">▶ TIL 보기</a>
+            <a href="pages/life-os/index.html" class="btn-pixel">◆ LIFE OS</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 스크롤 힌트 -->
+      <div class="scroll-hint">
+        <span class="font-pixel" style="font-size:8px;color:var(--text-muted)">SCROLL DOWN</span>
+        <div class="scroll-arrow blink">▼</div>
+      </div>
+    </section>
+
+    <!-- ── STATS DASHBOARD ── -->
+    <section class="section reveal">
+      <div class="section-header">
+        <span class="section-icon text-gold">◈</span>
+        <h2>PLAYER STATS</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box pixel-corner reveal">
+          <span class="stat-number text-cyan" data-count="0" id="stat-til">0</span>
+          <span class="stat-label">TIL 작성</span>
+        </div>
+        <div class="stat-box pixel-corner reveal">
+          <span class="stat-number text-pink" data-count="0" id="stat-books">0</span>
+          <span class="stat-label">독서 완료</span>
+        </div>
+        <div class="stat-box pixel-corner reveal">
+          <span class="stat-number text-gold" data-count="0" id="stat-xp">0</span>
+          <span class="stat-label">총 XP</span>
+        </div>
+        <div class="stat-box pixel-corner reveal">
+          <span class="stat-number text-green" data-count="0" id="stat-streak">0</span>
+          <span class="stat-label">연속 방문</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RECENT TIL ── -->
+    <section class="section reveal">
+      <div class="section-header">
+        <span class="section-icon text-cyan">◉</span>
+        <h2>RECENT TIL</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+        <a href="pages/til/index.html" class="btn-pixel btn-cyan" style="font-size:8px;padding:6px 12px;">ALL →</a>
+      </div>
+
+      <div id="recent-til-grid" class="til-preview-grid">
+        <!-- JS로 렌더링 -->
+      </div>
+    </section>
+
+    <!-- ── SKILL TREE ── -->
+    <section class="section reveal">
+      <div class="section-header">
+        <span class="section-icon text-purple">◇</span>
+        <h2>SKILL TREE</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+      </div>
+
+      <div class="skill-tree-grid">
+        <div class="skill-category pixel-card reveal">
+          <div class="skill-cat-header">
+            <span class="text-cyan font-pixel" style="font-size:10px;">◉ ML/DL</span>
+          </div>
+          <div class="skill-list">
+            <div class="skill-item">
+              <span class="skill-name">PyTorch</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill cyan" style="width:85%"></div></div>
+              <span class="skill-pct text-cyan">85</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Transformers</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill cyan" style="width:78%"></div></div>
+              <span class="skill-pct text-cyan">78</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Scikit-learn</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill cyan" style="width:90%"></div></div>
+              <span class="skill-pct text-cyan">90</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-category pixel-card reveal">
+          <div class="skill-cat-header">
+            <span class="text-gold font-pixel" style="font-size:10px;">◈ LLM/RAG</span>
+          </div>
+          <div class="skill-list">
+            <div class="skill-item">
+              <span class="skill-name">LangChain</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill gold" style="width:72%"></div></div>
+              <span class="skill-pct text-gold">72</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">RAG Pipeline</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill gold" style="width:68%"></div></div>
+              <span class="skill-pct text-gold">68</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Fine-tuning</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill gold" style="width:60%"></div></div>
+              <span class="skill-pct text-gold">60</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-category pixel-card reveal">
+          <div class="skill-cat-header">
+            <span class="text-green font-pixel" style="font-size:10px;">◆ BACKEND</span>
+          </div>
+          <div class="skill-list">
+            <div class="skill-item">
+              <span class="skill-name">Python</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill" style="width:92%"></div></div>
+              <span class="skill-pct text-green">92</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">FastAPI</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill" style="width:80%"></div></div>
+              <span class="skill-pct text-green">80</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Docker</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill" style="width:75%"></div></div>
+              <span class="skill-pct text-green">75</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-category pixel-card reveal">
+          <div class="skill-cat-header">
+            <span class="text-pink font-pixel" style="font-size:10px;">◎ DATA</span>
+          </div>
+          <div class="skill-list">
+            <div class="skill-item">
+              <span class="skill-name">Pandas/NumPy</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill pink" style="width:88%"></div></div>
+              <span class="skill-pct text-pink">88</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">SQL</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill pink" style="width:82%"></div></div>
+              <span class="skill-pct text-pink">82</span>
+            </div>
+            <div class="skill-item">
+              <span class="skill-name">Spark</span>
+              <div class="pixel-progress"><div class="pixel-progress-fill pink" style="width:55%"></div></div>
+              <span class="skill-pct text-pink">55</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ACTIVITY HEATMAP ── -->
+    <section class="section reveal">
+      <div class="section-header">
+        <span class="section-icon text-green">◉</span>
+        <h2>ACTIVITY LOG</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+      </div>
+      <div class="activity-container pixel-card">
+        <div class="activity-header">
+          <span class="font-pixel text-muted" style="font-size:8px;">CONTRIBUTION HEATMAP</span>
+          <span class="font-pixel text-gold" style="font-size:8px;" id="activity-total">0 ACTIVITIES</span>
+        </div>
+        <div id="heatmap-grid" class="heatmap-grid"></div>
+        <div class="heatmap-legend">
+          <span class="font-pixel text-muted" style="font-size:7px;">LESS</span>
+          <div class="legend-box" style="background:#1e2a4a;"></div>
+          <div class="legend-box" style="background:#1a4a2e;"></div>
+          <div class="legend-box" style="background:#1a6a3e;"></div>
+          <div class="legend-box" style="background:#39ff14;opacity:0.6;"></div>
+          <div class="legend-box" style="background:#39ff14;"></div>
+          <span class="font-pixel text-muted" style="font-size:7px;">MORE</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CURRENT FOCUS ── -->
+    <section class="section reveal">
+      <div class="section-header">
+        <span class="section-icon text-orange">◈</span>
+        <h2>CURRENT QUEST</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+      </div>
+
+      <div class="quest-grid">
+        <div class="quest-card pixel-card pixel-corner">
+          <div class="quest-header">
+            <span class="pixel-tag tag-dev">MAIN QUEST</span>
+            <span class="font-pixel text-muted" style="font-size:7px;">진행중</span>
+          </div>
+          <h3 style="margin:12px 0 8px;color:var(--accent-cyan);">RAG 시스템 고도화</h3>
+          <p>Hybrid Search + Re-ranking 파이프라인 구축 및 성능 벤치마킹</p>
+          <div class="pixel-progress" style="margin-top:12px;">
+            <div class="pixel-progress-fill cyan" style="width:65%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span class="font-pixel text-muted" style="font-size:7px;">65% COMPLETE</span>
+            <span class="font-pixel text-cyan" style="font-size:7px;">+100 XP</span>
+          </div>
+        </div>
+
+        <div class="quest-card pixel-card pixel-corner">
+          <div class="quest-header">
+            <span class="pixel-tag tag-paper">SIDE QUEST</span>
+            <span class="font-pixel text-muted" style="font-size:7px;">진행중</span>
+          </div>
+          <h3 style="margin:12px 0 8px;color:var(--accent-purple);">논문 리뷰 시리즈</h3>
+          <p>Attention Is All You Need → BERT → GPT 계보 정리</p>
+          <div class="pixel-progress" style="margin-top:12px;">
+            <div class="pixel-progress-fill" style="width:40%;background:repeating-linear-gradient(90deg,var(--accent-purple) 0,var(--accent-purple) 8px,transparent 8px,transparent 10px);"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span class="font-pixel text-muted" style="font-size:7px;">40% COMPLETE</span>
+            <span class="font-pixel text-purple" style="font-size:7px;">+80 XP</span>
+          </div>
+        </div>
+
+        <div class="quest-card pixel-card pixel-corner">
+          <div class="quest-header">
+            <span class="pixel-tag tag-book">READING QUEST</span>
+            <span class="font-pixel text-muted" style="font-size:7px;">진행중</span>
+          </div>
+          <h3 style="margin:12px 0 8px;color:var(--accent-pink);">밑바닥부터 딥러닝 3</h3>
+          <p>프레임워크 내부 구현 이해를 통한 딥러닝 기초 강화</p>
+          <div class="pixel-progress" style="margin-top:12px;">
+            <div class="pixel-progress-fill pink" style="width:58%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span class="font-pixel text-muted" style="font-size:7px;">58% COMPLETE</span>
+            <span class="font-pixel text-pink" style="font-size:7px;">+50 XP</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="footer-pixel">
+    <p>SELF-REFINING ENGINE © 2025 · Built with <span class="text-gold">♥</span> &amp; Pixel Art</p>
+    <p style="margin-top:8px;">
+      <a href="https://github.com/hyunNus" target="_blank">GITHUB</a>
+      <span class="text-muted"> · </span>
+      <a href="pages/til/index.html">TIL</a>
+      <span class="text-muted"> · </span>
+      <a href="pages/life-os/index.html">LIFE OS</a>
+    </p>
+  </footer>
+
+  <!-- 스크롤 탑 -->
+  <button class="scroll-top" title="맨 위로">▲</button>
+
+  <!-- 토스트 -->
+  <div class="pixel-toast"></div>
+
+  <script src="assets/js/pixel-core.js"></script>
+  <script src="assets/js/pixel-effects.js"></script>
+  <script src="assets/js/home.js"></script>
+</body>
+</html>

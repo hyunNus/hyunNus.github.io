@@ -1,0 +1,384 @@
+/* ── HERO SECTION ── */
+.hero-section {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--gap-xl) var(--gap-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.05) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(255,215,0,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xl);
+}
+
+/* ── Pixel Art Avatar ── */
+.hero-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hero-avatar {
+  width: 160px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-pixel-art {
+  position: relative;
+  width: 80px;
+  image-rendering: pixelated;
+}
+
+/* 픽셀 캐릭터 CSS 아트 */
+.px-head {
+  width: 48px;
+  height: 40px;
+  background: #f5c5a3;
+  margin: 0 auto;
+  position: relative;
+  border: 2px solid #8b5e3c;
+  box-shadow: 2px 2px 0 #8b5e3c;
+}
+
+.px-face {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.px-eye {
+  width: 8px; height: 8px;
+  background: #1a1a2e;
+  position: absolute;
+  top: 12px;
+}
+.px-eye.left  { left: 10px; }
+.px-eye.right { right: 10px; }
+
+.px-mouth {
+  width: 20px; height: 4px;
+  background: #c0392b;
+  position: absolute;
+  bottom: 8px;
+  left: 50%; transform: translateX(-50%);
+}
+
+.px-body {
+  width: 56px;
+  height: 52px;
+  background: #0f3460;
+  margin: 0 auto;
+  border: 2px solid #2d4080;
+  box-shadow: 2px 2px 0 #2d4080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.px-badge {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--accent-gold);
+  background: rgba(255,215,0,0.15);
+  border: 1px solid var(--accent-gold);
+  padding: 2px 4px;
+}
+
+.px-legs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.px-leg {
+  width: 20px;
+  height: 28px;
+  background: #1a3a6e;
+  border: 2px solid #2d4080;
+}
+
+.hero-level-badge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* ── Hero Content ── */
+.hero-content {
+  flex: 1;
+}
+
+.hero-greeting {
+  margin-bottom: var(--gap-sm);
+}
+
+.hero-title {
+  font-size: clamp(20px, 5vw, 36px);
+  line-height: 1.2;
+  margin: var(--gap-sm) 0;
+  text-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+
+.hero-subtitle {
+  font-family: var(--font-vt);
+  font-size: 22px;
+  color: var(--text-secondary);
+  margin: var(--gap-sm) 0;
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+  gap: var(--gap-md);
+  margin-top: var(--gap-lg);
+  flex-wrap: wrap;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.scroll-arrow {
+  color: var(--accent-gold);
+  font-size: 16px;
+}
+
+/* ── Stats Grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap-md);
+}
+
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── TIL Preview Grid ── */
+.til-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-md);
+}
+
+.til-preview-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-pixel);
+  padding: var(--gap-md);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.til-preview-card:hover {
+  border-color: var(--accent-cyan);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgba(0,212,255,0.3);
+}
+
+.til-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-sm);
+}
+
+.til-card-title {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.til-card-excerpt {
+  font-family: var(--font-vt);
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.til-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--gap-sm);
+}
+
+.til-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.til-tag {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 2px 6px;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+}
+
+/* ── Skill Tree ── */
+.skill-tree-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap-md);
+}
+
+.skill-category {
+  padding: var(--gap-md);
+}
+
+.skill-cat-header {
+  margin-bottom: var(--gap-md);
+  padding-bottom: var(--gap-sm);
+  border-bottom: 1px solid var(--border-pixel);
+}
+
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.skill-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 30px;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.skill-name {
+  font-family: var(--font-vt);
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.skill-pct {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  text-align: right;
+}
+
+/* ── Activity Heatmap ── */
+.activity-container {
+  padding: var(--gap-lg);
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--gap-md);
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(52, 1fr);
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.heatmap-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 10px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.5);
+  z-index: 10;
+  position: relative;
+}
+
+.heatmap-cell.level-1 { background: #1a4a2e; }
+.heatmap-cell.level-2 { background: #1a6a3e; }
+.heatmap-cell.level-3 { background: rgba(57,255,20,0.5); }
+.heatmap-cell.level-4 { background: #39ff14; }
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--gap-sm);
+  justify-content: flex-end;
+}
+
+.legend-box {
+  width: 12px;
+  height: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ── Quest Grid ── */
+.quest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-md);
+}
+
+.quest-card {
+  padding: var(--gap-md);
+}
+
+.quest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero-inner { flex-direction: column; text-align: center; }
+  .hero-actions { justify-content: center; }
+  .til-preview-grid { grid-template-columns: repeat(2, 1fr); }
+  .skill-tree-grid { grid-template-columns: 1fr; }
+  .quest-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .til-preview-grid { grid-template-columns: 1fr; }
+  .hero-avatar { display: none; }
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 | Self-Refining Engine</title>
+  <link rel="stylesheet" href="/assets/css/pixel-system.css">
+  <style>
+    .error-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--gap-lg);
+    }
+    .error-code {
+      font-family: var(--font-pixel);
+      font-size: clamp(40px, 10vw, 80px);
+      color: var(--accent-gold);
+      text-shadow: 4px 4px 0 rgba(255,215,0,0.2);
+      line-height: 1;
+      margin-bottom: var(--gap-md);
+    }
+    .error-msg {
+      font-family: var(--font-pixel);
+      font-size: clamp(10px, 2vw, 14px);
+      color: var(--accent-cyan);
+      margin-bottom: var(--gap-lg);
+    }
+    .error-pixel-art {
+      font-size: 60px;
+      margin-bottom: var(--gap-lg);
+      animation: pixel-float 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="grid-bg">
+  <div class="error-page">
+    <div class="error-pixel-art">👾</div>
+    <div class="error-code">404</div>
+    <div class="error-msg">PAGE NOT FOUND</div>
+    <p style="font-size:20px;color:var(--text-muted);margin-bottom:var(--gap-lg);">
+      이 페이지는 존재하지 않거나 이동되었습니다.
+    </p>
+    <a href="/" class="btn-pixel btn-cyan">◀ HOME으로 돌아가기</a>
+  </div>
+  <script src="/assets/js/pixel-core.js"></script>
+</body>
+</html>

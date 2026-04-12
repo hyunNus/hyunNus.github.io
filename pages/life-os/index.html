@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life OS | Self-Refining Engine</title>
+  <meta name="description" content="Life OS — 독서 트래커 & 성장 지표 대시보드">
+  <link rel="stylesheet" href="../../assets/css/pixel-system.css">
+  <link rel="stylesheet" href="../../assets/css/life-os.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231a1a2e'/><rect x='8' y='8' width='16' height='16' fill='%23ff6b9d'/><rect x='12' y='12' width='8' height='8' fill='%231a1a2e'/></svg>">
+</head>
+<body class="grid-bg">
+
+  <!-- 네비게이션 -->
+  <nav class="nav-pixel">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo">SRE<span>.</span>dev</a>
+      <button class="nav-menu-btn">MENU</button>
+      <ul class="nav-links">
+        <li><a href="../../index.html">HOME</a></li>
+        <li><a href="../til/index.html">TIL</a></li>
+        <li><a href="index.html">LIFE OS</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main style="padding-top:70px;position:relative;z-index:1;">
+
+    <!-- ── PAGE HEADER ── -->
+    <div class="lifeos-header">
+      <div class="lifeos-header-inner">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+            <span class="pixel-tag tag-book">◎ LIFE OS</span>
+            <span class="font-pixel text-muted" style="font-size:7px;">GROWTH TRACKER</span>
+          </div>
+          <h1 style="margin-bottom:8px;color:var(--accent-pink);">READING QUEST</h1>
+          <p style="font-size:20px;">독서를 통한 지식 축적과 성장 기록</p>
+        </div>
+        <button class="btn-pixel btn-pink" onclick="openNewBookModal()">
+          + ADD BOOK
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+
+      <!-- ── READING STATS ── -->
+      <div class="reading-stats-grid reveal">
+        <div class="stat-box pixel-corner">
+          <span class="stat-number text-pink" id="stat-completed">0</span>
+          <span class="stat-label">완독</span>
+        </div>
+        <div class="stat-box pixel-corner">
+          <span class="stat-number text-cyan" id="stat-reading">0</span>
+          <span class="stat-label">읽는 중</span>
+        </div>
+        <div class="stat-box pixel-corner">
+          <span class="stat-number text-gold" id="stat-pages">0</span>
+          <span class="stat-label">총 페이지</span>
+        </div>
+        <div class="stat-box pixel-corner">
+          <span class="stat-number text-purple" id="stat-book-xp">0</span>
+          <span class="stat-label">독서 XP</span>
+        </div>
+      </div>
+
+      <!-- ── CURRENTLY READING ── -->
+      <div class="section-header reveal" style="margin-top:var(--gap-xl);">
+        <span class="section-icon text-cyan">◉</span>
+        <h2>NOW READING</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+      </div>
+
+      <div id="currently-reading" class="currently-reading-grid reveal">
+        <!-- JS 렌더링 -->
+      </div>
+
+      <!-- ── FILTER BAR ── -->
+      <div class="book-filter-bar reveal" style="margin-top:var(--gap-xl);">
+        <div class="section-header" style="margin-bottom:0;">
+          <span class="section-icon text-pink">◎</span>
+          <h2>BOOK SHELF</h2>
+          <div class="pixel-divider" style="flex:1;margin:0;"></div>
+        </div>
+        <div class="filter-controls">
+          <div class="filter-status-group">
+            <button class="btn-pixel btn-pink active" data-status="all">ALL</button>
+            <button class="btn-pixel btn-pink" data-status="completed">완독</button>
+            <button class="btn-pixel btn-cyan" data-status="reading">읽는 중</button>
+            <button class="btn-pixel" data-status="wishlist" style="color:var(--text-muted);border-color:var(--text-muted);">위시리스트</button>
+          </div>
+          <div class="filter-cat-group">
+            <button class="btn-pixel" data-cat-filter="all" style="font-size:8px;padding:6px 10px;" id="cat-all-active">ALL GENRE</button>
+            <button class="btn-pixel" data-cat-filter="tech" style="font-size:8px;padding:6px 10px;color:var(--accent-cyan);border-color:var(--accent-cyan);">TECH</button>
+            <button class="btn-pixel" data-cat-filter="dev" style="font-size:8px;padding:6px 10px;color:var(--accent-green);border-color:var(--accent-green);">DEV</button>
+            <button class="btn-pixel" data-cat-filter="growth" style="font-size:8px;padding:6px 10px;color:var(--accent-orange);border-color:var(--accent-orange);">GROWTH</button>
+            <button class="btn-pixel" data-cat-filter="general" style="font-size:8px;padding:6px 10px;color:var(--accent-purple);border-color:var(--accent-purple);">GENERAL</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BOOK GRID ── -->
+      <div id="book-grid" class="book-grid">
+        <!-- JS 렌더링 -->
+      </div>
+
+      <!-- ── READING CHART ── -->
+      <div class="section-header reveal" style="margin-top:var(--gap-xl);">
+        <span class="section-icon text-gold">◈</span>
+        <h2>READING ANALYTICS</h2>
+        <div class="pixel-divider" style="flex:1;margin:0;"></div>
+      </div>
+
+      <div class="analytics-grid reveal">
+        <!-- 월별 독서량 -->
+        <div class="pixel-card analytics-card">
+          <h3 style="margin-bottom:var(--gap-md);color:var(--accent-gold);">MONTHLY BOOKS</h3>
+          <div id="monthly-chart" class="monthly-chart"></div>
+        </div>
+
+        <!-- 장르 분포 -->
+        <div class="pixel-card analytics-card">
+          <h3 style="margin-bottom:var(--gap-md);color:var(--accent-pink);">GENRE BREAKDOWN</h3>
+          <div id="genre-chart" class="genre-chart"></div>
+        </div>
+
+        <!-- 독서 목표 -->
+        <div class="pixel-card analytics-card">
+          <h3 style="margin-bottom:var(--gap-md);color:var(--accent-cyan);">2025 READING GOAL</h3>
+          <div class="reading-goal">
+            <div class="goal-numbers">
+              <span class="font-pixel text-cyan" style="font-size:32px;" id="goal-current">0</span>
+              <span class="font-pixel text-muted" style="font-size:14px;"> / </span>
+              <span class="font-pixel text-muted" style="font-size:20px;">20</span>
+              <span class="font-pixel text-muted" style="font-size:10px;"> BOOKS</span>
+            </div>
+            <div class="pixel-progress" style="margin:16px 0;">
+              <div class="pixel-progress-fill cyan" id="goal-bar" style="width:0%"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span class="font-pixel text-muted" style="font-size:8px;" id="goal-pct">0% COMPLETE</span>
+              <span class="font-pixel text-cyan" style="font-size:8px;" id="goal-remaining">20 REMAINING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ── ADD BOOK MODAL ── -->
+  <div class="pixel-modal-overlay" id="modal-new-book">
+    <div class="pixel-modal">
+      <button class="pixel-modal-close" onclick="closeModal('modal-new-book')">✕</button>
+      <h2 style="margin-bottom:var(--gap-lg);color:var(--accent-pink);">+ ADD BOOK</h2>
+
+      <div class="form-group">
+        <label class="form-label">TITLE</label>
+        <input type="text" class="pixel-input" id="new-book-title" placeholder="책 제목">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">AUTHOR</label>
+        <input type="text" class="pixel-input" id="new-book-author" placeholder="저자">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">GENRE</label>
+          <select class="pixel-select w-full" id="new-book-category">
+            <option value="tech">TECH</option>
+            <option value="dev">DEV</option>
+            <option value="growth">GROWTH</option>
+            <option value="general">GENERAL</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">STATUS</label>
+          <select class="pixel-select w-full" id="new-book-status">
+            <option value="wishlist">위시리스트</option>
+            <option value="reading">읽는 중</option>
+            <option value="completed">완독</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">TOTAL PAGES</label>
+          <input type="number" class="pixel-input" id="new-book-pages" placeholder="300">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">CURRENT PAGE</label>
+          <input type="number" class="pixel-input" id="new-book-current" placeholder="0">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">START DATE</label>
+          <input type="date" class="pixel-input" id="new-book-start">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label class="form-label">END DATE</label>
+          <input type="date" class="pixel-input" id="new-book-end">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">RATING</label>
+        <div class="difficulty-select" id="book-rating-select">
+          <span class="diff-star" data-val="1">★</span>
+          <span class="diff-star" data-val="2">★</span>
+          <span class="diff-star" data-val="3">★</span>
+          <span class="diff-star" data-val="4">★</span>
+          <span class="diff-star" data-val="5">★</span>
+        </div>
+        <input type="hidden" id="new-book-rating" value="0">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">TAGS <span class="text-muted" style="font-size:14px;">(쉼표로 구분)</span></label>
+        <input type="text" class="pixel-input" id="new-book-tags" placeholder="ML, Python, Deep Learning">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">REVIEW / MEMO</label>
+        <textarea class="pixel-input" id="new-book-review" rows="3" placeholder="한 줄 감상이나 메모..." style="resize:vertical;"></textarea>
+      </div>
+
+      <div style="display:flex;gap:var(--gap-md);margin-top:var(--gap-lg);">
+        <button class="btn-pixel btn-pink w-full" onclick="saveBook()">SAVE</button>
+        <button class="btn-pixel w-full" onclick="closeModal('modal-new-book')">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BOOK DETAIL MODAL ── -->
+  <div class="pixel-modal-overlay" id="modal-book-detail">
+    <div class="pixel-modal">
+      <button class="pixel-modal-close" onclick="closeModal('modal-book-detail')">✕</button>
+      <div id="book-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="footer-pixel">
+    <p>SELF-REFINING ENGINE © 2025 · <a href="../../index.html">HOME</a> · <a href="../til/index.html">TIL</a></p>
+  </footer>
+
+  <button class="scroll-top">▲</button>
+
+  <script src="../../assets/js/pixel-core.js"></script>
+  <script src="../../assets/js/pixel-effects.js"></script>
+  <script src="../../assets/js/life-os.js"></script>
+</body>
+</html>
