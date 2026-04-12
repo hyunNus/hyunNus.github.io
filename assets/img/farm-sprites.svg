@@ -1,0 +1,344 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" style="display:none">
+<defs>
+
+  <!-- ══════════════════════════════════════════════
+       농부 캐릭터 — 행복 (물 주기 / 씨앗 심기)
+       ══════════════════════════════════════════════ -->
+  <symbol id="farmer-happy" viewBox="0 0 32 48">
+    <!-- 모자 -->
+    <rect x="8" y="2" width="16" height="3" fill="#8B6914"/>
+    <rect x="6" y="5" width="20" height="2" fill="#A0791A"/>
+    <!-- 얼굴 -->
+    <rect x="10" y="7" width="12" height="10" fill="#FFCC80"/>
+    <!-- 눈 (행복) -->
+    <rect x="12" y="10" width="2" height="2" fill="#5D4037"/>
+    <rect x="18" y="10" width="2" height="2" fill="#5D4037"/>
+    <!-- 볼터치 -->
+    <rect x="11" y="13" width="3" height="2" fill="#FFAB91" opacity="0.6"/>
+    <rect x="18" y="13" width="3" height="2" fill="#FFAB91" opacity="0.6"/>
+    <!-- 입 (웃음) -->
+    <rect x="13" y="14" width="6" height="1" fill="#E64A19"/>
+    <rect x="12" y="13" width="2" height="1" fill="#E64A19"/>
+    <rect x="18" y="13" width="2" height="1" fill="#E64A19"/>
+    <!-- 몸통 (초록 작업복) -->
+    <rect x="9" y="17" width="14" height="14" fill="#558B2F"/>
+    <!-- 앞치마 -->
+    <rect x="11" y="19" width="10" height="10" fill="#8BC34A" opacity="0.7"/>
+    <!-- 팔 (왼쪽 — 물뿌리개 들기) -->
+    <rect x="4" y="17" width="5" height="3" fill="#FFCC80"/>
+    <rect x="4" y="20" width="3" height="8" fill="#558B2F"/>
+    <!-- 물뿌리개 -->
+    <rect x="1" y="18" width="6" height="5" fill="#1976D2"/>
+    <rect x="0" y="16" width="3" height="3" fill="#1976D2"/>
+    <rect x="7" y="22" width="1" height="1" fill="#64B5F6"/>
+    <rect x="6" y="24" width="1" height="1" fill="#64B5F6"/>
+    <rect x="8" y="23" width="1" height="1" fill="#64B5F6"/>
+    <!-- 팔 (오른쪽) -->
+    <rect x="23" y="17" width="5" height="3" fill="#FFCC80"/>
+    <rect x="24" y="20" width="3" height="8" fill="#558B2F"/>
+    <!-- 다리 -->
+    <rect x="10" y="31" width="5" height="10" fill="#5D4037"/>
+    <rect x="17" y="31" width="5" height="10" fill="#5D4037"/>
+    <!-- 신발 -->
+    <rect x="9" y="41" width="7" height="3" fill="#3E2723"/>
+    <rect x="16" y="41" width="7" height="3" fill="#3E2723"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       농부 캐릭터 — 보통 (서있기)
+       ══════════════════════════════════════════════ -->
+  <symbol id="farmer-normal" viewBox="0 0 32 48">
+    <rect x="8" y="2" width="16" height="3" fill="#8B6914"/>
+    <rect x="6" y="5" width="20" height="2" fill="#A0791A"/>
+    <rect x="10" y="7" width="12" height="10" fill="#FFCC80"/>
+    <rect x="12" y="10" width="2" height="2" fill="#5D4037"/>
+    <rect x="18" y="10" width="2" height="2" fill="#5D4037"/>
+    <rect x="11" y="13" width="3" height="2" fill="#FFAB91" opacity="0.5"/>
+    <rect x="18" y="13" width="3" height="2" fill="#FFAB91" opacity="0.5"/>
+    <!-- 입 (보통) -->
+    <rect x="13" y="14" width="6" height="1" fill="#E64A19"/>
+    <rect x="9" y="17" width="14" height="14" fill="#558B2F"/>
+    <rect x="11" y="19" width="10" height="10" fill="#8BC34A" opacity="0.7"/>
+    <!-- 팔 내림 -->
+    <rect x="4" y="17" width="5" height="3" fill="#FFCC80"/>
+    <rect x="4" y="20" width="3" height="11" fill="#558B2F"/>
+    <rect x="23" y="17" width="5" height="3" fill="#FFCC80"/>
+    <rect x="25" y="20" width="3" height="11" fill="#558B2F"/>
+    <rect x="10" y="31" width="5" height="10" fill="#5D4037"/>
+    <rect x="17" y="31" width="5" height="10" fill="#5D4037"/>
+    <rect x="9" y="41" width="7" height="3" fill="#3E2723"/>
+    <rect x="16" y="41" width="7" height="3" fill="#3E2723"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       농부 캐릭터 — 우울 (고개 숙임)
+       ══════════════════════════════════════════════ -->
+  <symbol id="farmer-sad" viewBox="0 0 32 48">
+    <rect x="8" y="4" width="16" height="3" fill="#8B6914"/>
+    <rect x="6" y="7" width="20" height="2" fill="#A0791A"/>
+    <!-- 고개 숙인 얼굴 -->
+    <rect x="10" y="9" width="12" height="10" fill="#FFCC80"/>
+    <!-- 눈 (내리깔기) -->
+    <rect x="12" y="12" width="2" height="1" fill="#5D4037"/>
+    <rect x="18" y="12" width="2" height="1" fill="#5D4037"/>
+    <!-- 눈물 -->
+    <rect x="13" y="14" width="1" height="3" fill="#64B5F6" opacity="0.7"/>
+    <rect x="19" y="14" width="1" height="3" fill="#64B5F6" opacity="0.7"/>
+    <!-- 입 (슬픔) -->
+    <rect x="13" y="16" width="6" height="1" fill="#E64A19"/>
+    <rect x="12" y="15" width="2" height="1" fill="#E64A19"/>
+    <rect x="18" y="15" width="2" height="1" fill="#E64A19"/>
+    <!-- 몸통 (구부정) -->
+    <rect x="9" y="19" width="14" height="12" fill="#558B2F"/>
+    <rect x="11" y="21" width="10" height="8" fill="#8BC34A" opacity="0.5"/>
+    <!-- 팔 축 처짐 -->
+    <rect x="4" y="20" width="5" height="3" fill="#FFCC80"/>
+    <rect x="3" y="23" width="3" height="9" fill="#558B2F"/>
+    <rect x="23" y="20" width="5" height="3" fill="#FFCC80"/>
+    <rect x="26" y="23" width="3" height="9" fill="#558B2F"/>
+    <!-- 다리 -->
+    <rect x="10" y="31" width="5" height="10" fill="#5D4037"/>
+    <rect x="17" y="31" width="5" height="10" fill="#5D4037"/>
+    <rect x="9" y="41" width="7" height="3" fill="#3E2723"/>
+    <rect x="16" y="41" width="7" height="3" fill="#3E2723"/>
+    <!-- 슬픔 구름 -->
+    <rect x="22" y="6" width="8" height="5" fill="#B0BEC5" opacity="0.6" rx="2"/>
+    <rect x="24" y="11" width="2" height="2" fill="#90A4AE" opacity="0.5"/>
+    <rect x="27" y="12" width="2" height="2" fill="#90A4AE" opacity="0.5"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       농부 캐릭터 — 매우 행복 (점프)
+       ══════════════════════════════════════════════ -->
+  <symbol id="farmer-excited" viewBox="0 0 32 48">
+    <rect x="8" y="0" width="16" height="3" fill="#8B6914"/>
+    <rect x="6" y="3" width="20" height="2" fill="#A0791A"/>
+    <rect x="10" y="5" width="12" height="10" fill="#FFCC80"/>
+    <!-- 반짝이는 눈 -->
+    <rect x="12" y="8" width="3" height="3" fill="#FFD54F"/>
+    <rect x="17" y="8" width="3" height="3" fill="#FFD54F"/>
+    <rect x="12" y="8" width="2" height="2" fill="#5D4037"/>
+    <rect x="17" y="8" width="2" height="2" fill="#5D4037"/>
+    <rect x="11" y="11" width="4" height="2" fill="#FFAB91" opacity="0.8"/>
+    <rect x="17" y="11" width="4" height="2" fill="#FFAB91" opacity="0.8"/>
+    <!-- 큰 웃음 -->
+    <rect x="12" y="12" width="8" height="2" fill="#E64A19"/>
+    <rect x="11" y="11" width="2" height="2" fill="#E64A19"/>
+    <rect x="19" y="11" width="2" height="2" fill="#E64A19"/>
+    <rect x="13" y="14" width="6" height="1" fill="#fff" opacity="0.8"/>
+    <rect x="9" y="15" width="14" height="14" fill="#558B2F"/>
+    <rect x="11" y="17" width="10" height="10" fill="#8BC34A" opacity="0.7"/>
+    <!-- 팔 들기 -->
+    <rect x="2" y="12" width="7" height="3" fill="#FFCC80"/>
+    <rect x="2" y="15" width="3" height="5" fill="#558B2F"/>
+    <rect x="23" y="12" width="7" height="3" fill="#FFCC80"/>
+    <rect x="27" y="15" width="3" height="5" fill="#558B2F"/>
+    <!-- 점프 다리 -->
+    <rect x="10" y="29" width="5" height="8" fill="#5D4037"/>
+    <rect x="17" y="29" width="5" height="8" fill="#5D4037"/>
+    <rect x="8" y="37" width="7" height="3" fill="#3E2723"/>
+    <rect x="17" y="37" width="7" height="3" fill="#3E2723"/>
+    <!-- 별 파티클 -->
+    <rect x="1" y="5" width="2" height="2" fill="#FFD54F" opacity="0.9"/>
+    <rect x="29" y="3" width="2" height="2" fill="#FFD54F" opacity="0.9"/>
+    <rect x="0" y="10" width="2" height="2" fill="#FFD54F" opacity="0.7"/>
+    <rect x="30" y="8" width="2" height="2" fill="#FFD54F" opacity="0.7"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 1 — 씨앗
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-seed" viewBox="0 0 24 24">
+    <rect x="8" y="16" width="8" height="4" fill="#795548"/>
+    <rect x="10" y="12" width="4" height="4" fill="#8D6E63"/>
+    <rect x="11" y="10" width="2" height="2" fill="#A1887F"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 2 — 새싹
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-sprout" viewBox="0 0 24 32">
+    <rect x="8" y="24" width="8" height="4" fill="#795548"/>
+    <rect x="11" y="10" width="2" height="14" fill="#558B2F"/>
+    <rect x="7" y="14" width="4" height="3" fill="#8BC34A"/>
+    <rect x="13" y="12" width="4" height="3" fill="#8BC34A"/>
+    <rect x="10" y="8" width="4" height="4" fill="#AED581"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 3 — 꽃봉오리
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-bud" viewBox="0 0 24 36">
+    <rect x="8" y="28" width="8" height="4" fill="#795548"/>
+    <rect x="11" y="12" width="2" height="16" fill="#558B2F"/>
+    <rect x="6" y="18" width="5" height="3" fill="#8BC34A"/>
+    <rect x="13" y="16" width="5" height="3" fill="#8BC34A"/>
+    <rect x="9" y="8" width="6" height="6" fill="#F48FB1"/>
+    <rect x="10" y="6" width="4" height="4" fill="#F06292"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 4 — 꽃 (봄)
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-flower-spring" viewBox="0 0 32 40">
+    <rect x="10" y="32" width="12" height="4" fill="#795548"/>
+    <rect x="14" y="14" width="4" height="18" fill="#558B2F"/>
+    <rect x="8" y="22" width="6" height="3" fill="#8BC34A"/>
+    <rect x="18" y="20" width="6" height="3" fill="#8BC34A"/>
+    <!-- 꽃잎 -->
+    <rect x="12" y="4" width="8" height="4" fill="#F48FB1"/>
+    <rect x="12" y="12" width="8" height="4" fill="#F48FB1"/>
+    <rect x="8" y="8" width="4" height="8" fill="#F48FB1"/>
+    <rect x="20" y="8" width="4" height="8" fill="#F48FB1"/>
+    <!-- 꽃 중심 -->
+    <rect x="12" y="8" width="8" height="8" fill="#FFD54F"/>
+    <rect x="13" y="9" width="6" height="6" fill="#FFF176"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 4 — 해바라기 (여름)
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-flower-summer" viewBox="0 0 32 48">
+    <rect x="10" y="40" width="12" height="4" fill="#795548"/>
+    <rect x="14" y="16" width="4" height="24" fill="#558B2F"/>
+    <rect x="8" y="28" width="6" height="3" fill="#8BC34A"/>
+    <rect x="18" y="24" width="6" height="3" fill="#8BC34A"/>
+    <!-- 해바라기 꽃잎 -->
+    <rect x="12" y="4" width="8" height="5" fill="#FDD835"/>
+    <rect x="12" y="15" width="8" height="5" fill="#FDD835"/>
+    <rect x="6" y="8" width="5" height="8" fill="#FDD835"/>
+    <rect x="21" y="8" width="5" height="8" fill="#FDD835"/>
+    <rect x="7" y="5" width="5" height="5" fill="#FDD835"/>
+    <rect x="20" y="5" width="5" height="5" fill="#FDD835"/>
+    <rect x="7" y="14" width="5" height="5" fill="#FDD835"/>
+    <rect x="20" y="14" width="5" height="5" fill="#FDD835"/>
+    <!-- 씨앗 중심 -->
+    <rect x="11" y="8" width="10" height="10" fill="#5D4037"/>
+    <rect x="12" y="9" width="8" height="8" fill="#795548"/>
+    <rect x="13" y="10" width="2" height="2" fill="#3E2723"/>
+    <rect x="17" y="10" width="2" height="2" fill="#3E2723"/>
+    <rect x="13" y="14" width="2" height="2" fill="#3E2723"/>
+    <rect x="17" y="14" width="2" height="2" fill="#3E2723"/>
+    <rect x="15" y="12" width="2" height="2" fill="#3E2723"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 4 — 단풍나무 (가을)
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-flower-autumn" viewBox="0 0 40 48">
+    <rect x="14" y="40" width="12" height="4" fill="#795548"/>
+    <rect x="18" y="20" width="4" height="20" fill="#6D4C41"/>
+    <!-- 단풍 잎 -->
+    <rect x="8" y="8" width="24" height="16" fill="#E64A19"/>
+    <rect x="4" y="12" width="10" height="10" fill="#EF6C00"/>
+    <rect x="26" y="12" width="10" height="10" fill="#EF6C00"/>
+    <rect x="12" y="4" width="16" height="10" fill="#FF7043"/>
+    <rect x="14" y="16" width="12" height="8" fill="#FF8A65"/>
+    <!-- 단풍 무늬 -->
+    <rect x="16" y="10" width="8" height="2" fill="#BF360C" opacity="0.5"/>
+    <rect x="14" y="14" width="12" height="2" fill="#BF360C" opacity="0.5"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       식물 성장 단계 4 — 눈 덮인 나무 (겨울)
+       ══════════════════════════════════════════════ -->
+  <symbol id="plant-flower-winter" viewBox="0 0 40 48">
+    <rect x="14" y="40" width="12" height="4" fill="#795548"/>
+    <rect x="18" y="20" width="4" height="20" fill="#6D4C41"/>
+    <!-- 나무 (잎 없음) -->
+    <rect x="8" y="10" width="24" height="14" fill="#546E7A"/>
+    <rect x="4" y="14" width="10" height="8" fill="#607D8B"/>
+    <rect x="26" y="14" width="10" height="8" fill="#607D8B"/>
+    <rect x="12" y="6" width="16" height="8" fill="#78909C"/>
+    <!-- 눈 -->
+    <rect x="8" y="8" width="24" height="4" fill="#ECEFF1"/>
+    <rect x="4" y="12" width="10" height="3" fill="#ECEFF1"/>
+    <rect x="26" y="12" width="10" height="3" fill="#ECEFF1"/>
+    <rect x="12" y="4" width="16" height="4" fill="#ECEFF1"/>
+    <rect x="16" y="2" width="8" height="3" fill="#ECEFF1"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       땅 / 밭 타일
+       ══════════════════════════════════════════════ -->
+  <symbol id="soil-tile" viewBox="0 0 32 16">
+    <rect x="0" y="0" width="32" height="16" fill="#8D6E63"/>
+    <rect x="0" y="0" width="32" height="4" fill="#A1887F"/>
+    <!-- 밭 이랑 -->
+    <rect x="4" y="6" width="24" height="2" fill="#6D4C41" opacity="0.5"/>
+    <rect x="4" y="10" width="24" height="2" fill="#6D4C41" opacity="0.5"/>
+    <rect x="2" y="4" width="2" height="8" fill="#6D4C41" opacity="0.3"/>
+    <rect x="28" y="4" width="2" height="8" fill="#6D4C41" opacity="0.3"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       집 (농가)
+       ══════════════════════════════════════════════ -->
+  <symbol id="farmhouse" viewBox="0 0 64 56">
+    <!-- 지붕 -->
+    <rect x="0" y="16" width="64" height="4" fill="#B71C1C"/>
+    <rect x="4" y="12" width="56" height="4" fill="#C62828"/>
+    <rect x="10" y="8" width="44" height="4" fill="#D32F2F"/>
+    <rect x="18" y="4" width="28" height="4" fill="#E53935"/>
+    <rect x="26" y="0" width="12" height="4" fill="#EF5350"/>
+    <!-- 벽 -->
+    <rect x="4" y="20" width="56" height="32" fill="#FFF8E1"/>
+    <!-- 창문 왼쪽 -->
+    <rect x="10" y="26" width="14" height="12" fill="#B3E5FC"/>
+    <rect x="10" y="26" width="14" height="2" fill="#795548"/>
+    <rect x="16" y="26" width="2" height="12" fill="#795548"/>
+    <rect x="10" y="32" width="14" height="2" fill="#795548"/>
+    <!-- 창문 오른쪽 -->
+    <rect x="40" y="26" width="14" height="12" fill="#B3E5FC"/>
+    <rect x="40" y="26" width="14" height="2" fill="#795548"/>
+    <rect x="46" y="26" width="2" height="12" fill="#795548"/>
+    <rect x="40" y="32" width="14" height="2" fill="#795548"/>
+    <!-- 문 -->
+    <rect x="24" y="34" width="16" height="18" fill="#795548"/>
+    <rect x="26" y="36" width="12" height="14" fill="#A1887F"/>
+    <rect x="34" y="42" width="3" height="3" fill="#FFD54F"/>
+    <!-- 굴뚝 -->
+    <rect x="46" y="0" width="8" height="14" fill="#8D6E63"/>
+    <rect x="44" y="0" width="12" height="3" fill="#795548"/>
+    <!-- 연기 -->
+    <rect x="47" y="-4" width="4" height="4" fill="#B0BEC5" opacity="0.6"/>
+    <rect x="46" y="-8" width="5" height="4" fill="#B0BEC5" opacity="0.4"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       울타리
+       ══════════════════════════════════════════════ -->
+  <symbol id="fence" viewBox="0 0 64 24">
+    <rect x="0" y="8" width="64" height="4" fill="#A1887F"/>
+    <rect x="0" y="14" width="64" height="4" fill="#A1887F"/>
+    <rect x="4" y="0" width="4" height="24" fill="#8D6E63"/>
+    <rect x="4" y="0" width="4" height="4" fill="#6D4C41"/>
+    <rect x="20" y="0" width="4" height="24" fill="#8D6E63"/>
+    <rect x="20" y="0" width="4" height="4" fill="#6D4C41"/>
+    <rect x="36" y="0" width="4" height="24" fill="#8D6E63"/>
+    <rect x="36" y="0" width="4" height="4" fill="#6D4C41"/>
+    <rect x="52" y="0" width="4" height="24" fill="#8D6E63"/>
+    <rect x="52" y="0" width="4" height="4" fill="#6D4C41"/>
+  </symbol>
+
+  <!-- ══════════════════════════════════════════════
+       구름
+       ══════════════════════════════════════════════ -->
+  <symbol id="cloud" viewBox="0 0 48 24">
+    <rect x="8" y="8" width="32" height="12" fill="white" opacity="0.85"/>
+    <rect x="4" y="12" width="40" height="8" fill="white" opacity="0.85"/>
+    <rect x="12" y="4" width="20" height="8" fill="white" opacity="0.85"/>
+    <rect x="16" y="0" width="12" height="6" fill="white" opacity="0.85"/>
+  </symbol>
+
+  <!-- 책 아이콘 -->
+  <symbol id="book-icon" viewBox="0 0 24 28">
+    <rect x="2" y="2" width="20" height="24" fill="#1976D2"/>
+    <rect x="2" y="2" width="4" height="24" fill="#0D47A1"/>
+    <rect x="8" y="6" width="10" height="2" fill="white" opacity="0.7"/>
+    <rect x="8" y="10" width="10" height="2" fill="white" opacity="0.7"/>
+    <rect x="8" y="14" width="7" height="2" fill="white" opacity="0.7"/>
+  </symbol>
+
+</defs>
+</svg>
