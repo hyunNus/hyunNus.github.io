@@ -3,249 +3,411 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌱 TIL — SRE Farm</title>
-  <link rel="stylesheet" href="/assets/css/farm.css">
+  <title>TIL — Hyunwoo Lee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* ── TIL 페이지 전용 ─────────────────────────────── */
-    .til-hero {
-      background: linear-gradient(135deg, var(--accent-soft) 0%, var(--gold-soft) 100%);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-xl) var(--gap-lg);
-      margin-bottom: var(--gap-xl);
-      display: flex;
-      align-items: center;
-      gap: var(--gap-lg);
-    }
-    .til-hero-icon { font-size: 48px; animation: float 3s ease-in-out infinite; flex-shrink: 0; }
-    .til-hero-title { font-family: var(--font-pixel); font-size: 14px; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.6; }
-    .til-hero-desc  { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    /* ── 맥주펍 테마 변수 ──────────────────────────────── */
+    :root {
+      --pub-bg:       #0D0A07;
+      --pub-bg2:      #150F09;
+      --pub-surface:  #1E1509;
+      --pub-card:     #231A0C;
+      --pub-border:   #3D2B14;
+      --pub-border2:  #5C3D1A;
 
-    /* 카테고리 탭 */
-    .cat-tabs {
-      display: flex;
-      gap: var(--gap-sm);
-      margin-bottom: var(--gap-lg);
-      flex-wrap: wrap;
+      --ember:        #FF6B1A;
+      --ember-glow:   #FF8C42;
+      --ember-deep:   #C84B00;
+      --gold:         #D4A017;
+      --gold-light:   #F0C040;
+      --amber:        #B8730A;
+      --cream:        #F5E6C8;
+      --cream-dim:    #C4A882;
+      --smoke:        #8B7355;
+
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-body:  'Noto Sans KR', sans-serif;
+      --radius:     6px;
+      --transition: 0.2s ease;
     }
-    .cat-tab {
-      font-family: var(--font-pixel);
-      font-size: 8px;
-      padding: 10px 16px;
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--pub-bg);
+      color: var(--cream);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── 배경 텍스처 (나무 결) ─────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        repeating-linear-gradient(
+          92deg,
+          transparent 0px, transparent 18px,
+          rgba(61,43,20,0.15) 18px, rgba(61,43,20,0.15) 19px
+        ),
+        repeating-linear-gradient(
+          180deg,
+          transparent 0px, transparent 60px,
+          rgba(92,61,26,0.08) 60px, rgba(92,61,26,0.08) 61px
+        );
+      pointer-events: none;
+    }
+
+    /* ── 모닥불 글로우 배경 ────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse at center bottom,
+        rgba(255,107,26,0.12) 0%,
+        rgba(200,75,0,0.06) 40%,
+        transparent 70%);
+      pointer-events: none; z-index: 0;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%,100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+      50%      { opacity: 1;   transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* ── 네비게이션 ────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,10,7,0.92);
+      border-bottom: 1px solid var(--pub-border);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      max-width: 900px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-logo {
+      font-family: var(--font-pixel); font-size: 10px;
+      color: var(--ember-glow); text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-pixel); font-size: 8px;
+      color: var(--cream-dim); text-decoration: none;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--ember-glow); }
+
+    /* ── 페이지 래퍼 ───────────────────────────────────── */
+    .page-wrapper {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* ── 헤더 (모닥불 씬) ──────────────────────────────── */
+    .pub-header {
+      text-align: center;
+      padding: 48px 20px 40px;
+      position: relative;
+    }
+
+    /* 모닥불 Canvas */
+    #fire-canvas {
+      display: block; margin: 0 auto 24px;
+      image-rendering: pixelated;
+    }
+
+    .pub-title {
+      font-family: var(--font-pixel); font-size: 18px;
+      color: var(--gold-light);
+      text-shadow: 0 0 20px rgba(212,160,23,0.6), 0 0 40px rgba(255,107,26,0.3);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    .pub-subtitle {
+      font-size: 13px; color: var(--cream-dim);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── 필터 바 ───────────────────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      padding: 16px 20px;
+      background: var(--pub-surface);
+      border: 1px solid var(--pub-border);
+      border-radius: var(--radius);
+    }
+    .filter-label {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); margin-right: 4px;
+    }
+    .filter-btn {
+      font-family: var(--font-pixel); font-size: 7px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--pub-border);
+      border-radius: 3px;
+      color: var(--cream-dim);
       cursor: pointer;
       transition: all var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
-    .cat-tab:hover,
-    .cat-tab.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
+    .filter-btn:hover { border-color: var(--ember); color: var(--ember-glow); }
+    .filter-btn.active {
+      background: var(--ember);
+      border-color: var(--ember);
+      color: var(--pub-bg);
     }
-    .cat-count {
-      background: rgba(255,255,255,0.3);
-      border-radius: 10px;
-      padding: 1px 6px;
-      font-size: 7px;
+    .filter-sep { width: 1px; height: 20px; background: var(--pub-border); margin: 0 4px; }
+    .search-input {
+      flex: 1; min-width: 160px;
+      background: var(--pub-bg2);
+      border: 1px solid var(--pub-border);
+      border-radius: 3px;
+      padding: 7px 12px;
+      font-family: var(--font-body); font-size: 13px;
+      color: var(--cream);
+      outline: none;
+      transition: border-color var(--transition);
     }
+    .search-input::placeholder { color: var(--smoke); }
+    .search-input:focus { border-color: var(--ember); }
 
-    /* TIL 카드 그리드 */
+    /* ── TIL 그리드 ────────────────────────────────────── */
     .til-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: var(--gap-md);
+      gap: 16px;
     }
 
+    /* ── TIL 카드 ──────────────────────────────────────── */
     .til-card {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: var(--gap-md);
+      background: var(--pub-card);
+      border: 1px solid var(--pub-border);
+      border-radius: var(--radius);
+      padding: 20px;
       cursor: pointer;
       transition: all var(--transition);
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: var(--gap-sm);
     }
-
-    /* 카테고리별 상단 색상 바 */
-    .til-card[data-cat="DEV"]::before   { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:#4CAF50; }
-    .til-card[data-cat="PAPER"]::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:#2196F3; }
-    .til-card[data-cat="STACK"]::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:#FF9800; }
-
+    /* 상단 불빛 라인 */
+    .til-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--ember), transparent);
+      opacity: 0; transition: opacity var(--transition);
+    }
+    /* 카드 글로우 */
+    .til-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top, rgba(255,107,26,0.04) 0%, transparent 60%);
+      opacity: 0; transition: opacity var(--transition);
+      pointer-events: none;
+    }
     .til-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--accent);
+      border-color: var(--pub-border2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,107,26,0.12), 0 2px 8px rgba(0,0,0,0.4);
     }
+    .til-card:hover::before { opacity: 1; }
+    .til-card:hover::after  { opacity: 1; }
 
-    /* 성장 단계 아이콘 (TIL 수에 따라) */
-    .til-growth-icon {
-      position: absolute;
-      top: var(--gap-sm);
-      right: var(--gap-sm);
-      font-size: 16px;
-      opacity: 0.6;
+    .til-card-cat {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--ember); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
     }
-
-    .til-cat-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      border: 1px solid;
-      width: fit-content;
+    .til-card-cat .cat-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--ember);
+      box-shadow: 0 0 6px var(--ember);
+      animation: dotPulse 2s ease-in-out infinite;
     }
-    .cat-dev   { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
-    .cat-paper { background: #E3F2FD; color: #1565C0; border-color: #90CAF9; }
-    .cat-stack { background: #FFF3E0; color: #E65100; border-color: #FFCC80; }
-
-    .til-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+    @keyframes dotPulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 6px var(--ember); }
+      50%      { opacity: 0.5; box-shadow: 0 0 2px var(--ember); }
     }
-
-    .til-summary {
-      font-size: 12px;
-      color: var(--text-muted);
+    .til-card-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+      line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .til-card-summary {
+      font-size: 12px; color: var(--cream-dim);
       line-height: 1.6;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      flex: 1;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .til-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; flex-wrap: wrap;
+    }
+    .til-card-date {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke);
+    }
+    .til-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .til-tag {
+      font-family: var(--font-pixel); font-size: 6px;
+      padding: 3px 7px;
+      background: rgba(255,107,26,0.12);
+      border: 1px solid rgba(255,107,26,0.25);
+      border-radius: 2px;
+      color: var(--ember-glow);
     }
 
-    .til-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--gap-sm);
-      flex-wrap: wrap;
-      padding-top: var(--gap-sm);
-      border-top: 1px solid var(--card-border);
+    /* ── 빈 상태 ───────────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 80px 20px;
+      color: var(--smoke);
+    }
+    .empty-state-icon { font-size: 40px; display: block; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state-title {
+      font-family: var(--font-pixel); font-size: 10px;
+      color: var(--cream-dim); margin-bottom: 8px;
     }
 
-    .til-date { font-family: var(--font-pixel); font-size: 7px; color: var(--text-muted); }
-
-    .til-tags { display: flex; gap: 4px; flex-wrap: wrap; }
-
-    /* 상세 모달 */
-    .detail-meta {
-      display: flex;
-      align-items: center;
-      gap: var(--gap-sm);
-      flex-wrap: wrap;
-      margin-bottom: var(--gap-lg);
+    /* ── 상세 모달 ─────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
     }
-    .detail-date { font-family: var(--font-pixel); font-size: 8px; color: var(--text-muted); }
-    .detail-body {
-      font-size: 14px;
-      color: var(--text-secondary);
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--pub-card);
+      border: 1px solid var(--pub-border2);
+      border-radius: var(--radius);
+      max-width: 680px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 0 60px rgba(255,107,26,0.15), 0 20px 60px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .modal-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--pub-border);
+      position: sticky; top: 0;
+      background: var(--pub-card);
+      z-index: 10;
+    }
+    .modal-cat {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--ember); margin-bottom: 10px;
+    }
+    .modal-title {
+      font-size: 18px; font-weight: 700; color: var(--cream);
+      line-height: 1.4; margin-bottom: 10px;
+    }
+    .modal-meta {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    }
+    .modal-date { font-family: var(--font-pixel); font-size: 7px; color: var(--smoke); }
+    .modal-body {
+      padding: 24px;
+      font-size: 14px; color: var(--cream-dim);
       line-height: 1.8;
-      white-space: pre-wrap;
     }
-    .detail-body h1,
-    .detail-body h2,
-    .detail-body h3 {
-      font-family: var(--font-pixel);
-      font-size: 10px;
-      color: var(--text-primary);
-      margin: var(--gap-lg) 0 var(--gap-sm);
-      line-height: 1.6;
+    .modal-body h1,.modal-body h2,.modal-body h3 {
+      color: var(--cream); margin: 20px 0 10px; font-size: 16px;
     }
-    .detail-body code {
-      background: var(--accent-soft);
-      color: var(--accent);
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-family: monospace;
-      font-size: 13px;
+    .modal-body h2 { font-size: 15px; }
+    .modal-body h3 { font-size: 14px; color: var(--gold-light); }
+    .modal-body code {
+      background: var(--pub-bg2); border: 1px solid var(--pub-border);
+      border-radius: 3px; padding: 2px 6px;
+      font-family: monospace; font-size: 12px; color: var(--ember-glow);
     }
-    .detail-body pre {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: var(--gap-md);
-      overflow-x: auto;
-      margin: var(--gap-md) 0;
+    .modal-body pre {
+      background: var(--pub-bg2); border: 1px solid var(--pub-border);
+      border-radius: var(--radius); padding: 16px; overflow-x: auto;
+      margin: 12px 0;
     }
-    .detail-body pre code {
-      background: none;
-      padding: 0;
-      color: var(--text-primary);
+    .modal-body pre code { background: none; border: none; padding: 0; color: var(--cream-dim); }
+    .modal-body blockquote {
+      border-left: 3px solid var(--ember);
+      padding-left: 16px; margin: 12px 0;
+      color: var(--smoke); font-style: italic;
     }
-    .detail-body blockquote {
-      border-left: 3px solid var(--accent);
-      padding-left: var(--gap-md);
-      color: var(--text-muted);
-      font-style: italic;
-      margin: var(--gap-md) 0;
-    }
-    .notion-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--text-muted);
-      text-decoration: none;
-      padding: 6px 10px;
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-sm);
+    .modal-body a { color: var(--ember-glow); }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: 1px solid var(--pub-border);
+      border-radius: 3px; width: 32px; height: 32px;
+      color: var(--cream-dim); cursor: pointer; font-size: 16px;
       transition: all var(--transition);
-      margin-top: var(--gap-md);
+      display: flex; align-items: center; justify-content: center;
     }
-    .notion-link:hover { border-color: var(--accent); color: var(--accent); }
+    .modal-close:hover { border-color: var(--ember); color: var(--ember); }
+    .modal-notion-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); text-decoration: none;
+      border: 1px solid var(--pub-border);
+      border-radius: 3px; padding: 6px 10px;
+      margin: 0 24px 24px;
+      transition: all var(--transition);
+    }
+    .modal-notion-link:hover { border-color: var(--ember); color: var(--ember-glow); }
 
-    /* 통계 바 */
-    .cat-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--gap-md);
-      margin-bottom: var(--gap-xl);
-    }
-    .cat-stat-card {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: var(--gap-md);
+    /* ── 푸터 ──────────────────────────────────────────── */
+    .footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--pub-border);
+      padding: 24px 20px;
       text-align: center;
+    }
+    .footer-text {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); margin-bottom: 12px;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 20px; list-style: none; }
+    .footer-links a {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); text-decoration: none;
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: var(--ember-glow); }
+
+    /* ── 스크롤 탑 ─────────────────────────────────────── */
+    #scroll-top {
+      position: fixed; bottom: 24px; right: 24px; z-index: 50;
+      width: 40px; height: 40px;
+      background: var(--pub-card); border: 1px solid var(--pub-border2);
+      border-radius: var(--radius); color: var(--ember-glow);
+      cursor: pointer; font-size: 16px;
+      display: none; align-items: center; justify-content: center;
       transition: all var(--transition);
     }
-    .cat-stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-    .cat-stat-icon { font-size: 24px; margin-bottom: var(--gap-sm); }
-    .cat-stat-count { font-family: var(--font-pixel); font-size: 18px; color: var(--accent); margin-bottom: 4px; }
-    .cat-stat-label { font-family: var(--font-pixel); font-size: 7px; color: var(--text-muted); }
+    #scroll-top.visible { display: flex; }
+    #scroll-top:hover { background: var(--ember); color: var(--pub-bg); border-color: var(--ember); }
 
-    @media (max-width: 600px) {
-      .til-hero { flex-direction: column; text-align: center; }
-      .cat-stats { grid-template-columns: repeat(3, 1fr); gap: var(--gap-sm); }
-      .til-grid { grid-template-columns: 1fr; }
+    /* ── 결과 카운트 ───────────────────────────────────── */
+    .result-count {
+      font-family: var(--font-pixel); font-size: 8px;
+      color: var(--smoke); margin-bottom: 20px;
     }
+    .result-count span { color: var(--ember-glow); }
   </style>
 </head>
 <body>
   <nav class="nav">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">🌾 SRE</a>
+      <a href="/" class="nav-logo">Hyunwoo Lee</a>
       <ul class="nav-links">
         <li><a href="/">HOME</a></li>
         <li><a href="/pages/til/" class="active">TIL</a></li>
@@ -256,71 +418,59 @@
 
   <div class="page-wrapper">
 
-    <!-- 히어로 -->
-    <div class="til-hero">
-      <span class="til-hero-icon" id="til-hero-icon">🌱</span>
-      <div>
-        <div class="til-hero-title">Today I Learned</div>
-        <p class="til-hero-desc">노션에서 작성한 TIL이 자동으로 여기에 피어납니다.<br>DEV · PAPER · STACK 카테고리로 분류됩니다.</p>
-      </div>
+    <!-- 헤더 모닥불 씬 -->
+    <div class="pub-header">
+      <canvas id="fire-canvas" width="200" height="120"></canvas>
+      <h1 class="pub-title">TIL</h1>
+      <p class="pub-subtitle">Today I Learned — a log of things I picked up.</p>
     </div>
 
-    <!-- 카테고리 통계 -->
-    <div class="cat-stats">
-      <div class="cat-stat-card">
-        <div class="cat-stat-icon">💻</div>
-        <div class="cat-stat-count" id="cnt-dev">0</div>
-        <div class="cat-stat-label">DEV</div>
-      </div>
-      <div class="cat-stat-card">
-        <div class="cat-stat-icon">📄</div>
-        <div class="cat-stat-count" id="cnt-paper">0</div>
-        <div class="cat-stat-label">PAPER</div>
-      </div>
-      <div class="cat-stat-card">
-        <div class="cat-stat-icon">🔧</div>
-        <div class="cat-stat-count" id="cnt-stack">0</div>
-        <div class="cat-stat-label">STACK</div>
-      </div>
+    <!-- 필터 바 -->
+    <div class="filter-bar">
+      <span class="filter-label">FILTER</span>
+      <button class="filter-btn active" data-cat="ALL">ALL</button>
+      <button class="filter-btn" data-cat="DEV">DEV</button>
+      <button class="filter-btn" data-cat="PAPER">PAPER</button>
+      <button class="filter-btn" data-cat="STACK">STACK</button>
+      <div class="filter-sep"></div>
+      <input class="search-input" type="text" id="search-input" placeholder="Search...">
     </div>
 
-    <!-- 검색 -->
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="search-input" placeholder="TIL 검색...">
-    </div>
-
-    <!-- 카테고리 탭 -->
-    <div class="cat-tabs" id="cat-tabs">
-      <button class="cat-tab active" data-cat="ALL" onclick="filterCat('ALL')">🌾 전체 <span class="cat-count" id="cnt-all">0</span></button>
-      <button class="cat-tab" data-cat="DEV" onclick="filterCat('DEV')">💻 DEV <span class="cat-count" id="cnt-dev-tab">0</span></button>
-      <button class="cat-tab" data-cat="PAPER" onclick="filterCat('PAPER')">📄 PAPER <span class="cat-count" id="cnt-paper-tab">0</span></button>
-      <button class="cat-tab" data-cat="STACK" onclick="filterCat('STACK')">🔧 STACK <span class="cat-count" id="cnt-stack-tab">0</span></button>
-    </div>
+    <!-- 결과 카운트 -->
+    <div class="result-count" id="result-count"></div>
 
     <!-- TIL 목록 -->
-    <div id="til-list">
+    <div id="til-container">
       <div class="empty-state">
-        <span class="empty-state-icon">🌱</span>
-        <div class="empty-state-title">아직 TIL이 없어요</div>
-        <p class="empty-state-desc">노션 TIL 데이터베이스에 글을 작성하고<br>Published를 체크하면 자동으로 나타납니다.</p>
+        <span class="empty-state-icon">🔥</span>
+        <div class="empty-state-title">No posts yet.</div>
       </div>
     </div>
 
   </div>
 
   <!-- 상세 모달 -->
-  <div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
-    <div class="modal" id="modal-content">
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <div id="modal-body"></div>
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-cat" id="modal-cat"></div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-meta">
+          <span class="modal-date" id="modal-date"></span>
+          <div id="modal-tags" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <a class="modal-notion-link" id="modal-notion-link" href="#" target="_blank">📝 View in Notion →</a>
     </div>
   </div>
 
   <footer class="footer">
-    <div class="footer-text">🌾 Self-Refining Engine · Powered by Notion &amp; GitHub Pages</div>
+    <div class="footer-text">Hyunwoo Lee · Powered by Notion &amp; GitHub Pages</div>
     <ul class="footer-links">
-      <li><a href="/">HOME</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/pages/til/">TIL</a></li>
       <li><a href="/pages/life-os/">Books</a></li>
       <li><a href="https://github.com/hyunNus/hyunNus.github.io" target="_blank">GitHub</a></li>
     </ul>
@@ -329,164 +479,235 @@
   <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
   <script>
-  // ══ 계절 ══════════════════════════════════════════════════
-  const now = new Date();
-  const m = now.getMonth()+1;
-  const season = m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';
-  document.documentElement.setAttribute('data-season', season);
+  // ══════════════════════════════════════════════════════════
+  //  모닥불 Canvas 애니메이션
+  // ══════════════════════════════════════════════════════════
+  (function() {
+    const canvas = document.getElementById('fire-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const SCALE = 2;
+    const GW = Math.ceil(W/SCALE), GH = Math.ceil(H/SCALE);
 
-  // TIL 성장 아이콘
-  const GROWTH_ICONS = {spring:'🌸',summer:'🌻',autumn:'🍂',winter:'❄️'};
+    function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x*SCALE,y*SCALE,w*SCALE,h*SCALE); }
 
-  // ══ 데이터 ════════════════════════════════════════════════
-  let allItems = [];
+    // 통나무
+    function drawLog() {
+      const lx = GW/2-12, ly = GH-10;
+      px(lx,    ly,   24, 5, '#4E342E');
+      px(lx,    ly,   24, 1, '#6D4C41');
+      px(lx+2,  ly+1, 20, 1, '#795548');
+      px(lx+6,  ly,    2, 5, '#3E2723');
+      px(lx+16, ly,    2, 5, '#3E2723');
+      // 두번째 통나무 (X자)
+      px(lx+2,  ly+2, 20, 5, '#5D4037');
+      px(lx+2,  ly+2, 20, 1, '#795548');
+    }
+
+    // 불씨 파티클
+    const embers = Array.from({length:30}, ()=>newEmber());
+    function newEmber() {
+      return {
+        x: (GW/2 - 6) + Math.random()*12,
+        y: GH - 14,
+        vx: (Math.random()-0.5)*1.2,
+        vy: -(Math.random()*2.5+1.5),
+        life: Math.random()*0.6+0.4,
+        maxLife: Math.random()*0.6+0.4,
+        sz: Math.random()*2+1,
+      };
+    }
+
+    // 불꽃 파티클
+    const flames = Array.from({length:20}, ()=>newFlame());
+    function newFlame() {
+      return {
+        x: (GW/2 - 8) + Math.random()*16,
+        y: GH - 14,
+        vx: (Math.random()-0.5)*0.8,
+        vy: -(Math.random()*3+2),
+        life: 1.0,
+        maxLife: Math.random()*0.4+0.3,
+        sz: Math.random()*4+2,
+        hue: Math.random()*30, // 0=빨강, 30=주황
+      };
+    }
+
+    function fireColor(hue, alpha) {
+      const r = 255;
+      const g = Math.floor(hue * 5);
+      const b = 0;
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    let lastT = 0;
+    function draw(t) {
+      const dt = Math.min((t - lastT) / 16.67, 3);
+      lastT = t;
+      ctx.clearRect(0, 0, W, H);
+
+      // 바닥 글로우
+      const grd = ctx.createRadialGradient(W/2, H-10, 0, W/2, H-10, 60);
+      grd.addColorStop(0, 'rgba(255,107,26,0.35)');
+      grd.addColorStop(0.5, 'rgba(200,75,0,0.12)');
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // 불꽃
+      flames.forEach(f => {
+        f.x += f.vx * dt;
+        f.y += f.vy * dt;
+        f.life -= dt / (f.maxLife * 60);
+        if(f.life <= 0) Object.assign(f, newFlame());
+        const alpha = Math.max(0, f.life) * 0.9;
+        const sz = f.sz * f.life * SCALE;
+        if(sz < 1) return;
+        const gf = ctx.createRadialGradient(f.x*SCALE, f.y*SCALE, 0, f.x*SCALE, f.y*SCALE, sz);
+        gf.addColorStop(0, fireColor(f.hue+20, alpha));
+        gf.addColorStop(0.4, fireColor(f.hue, alpha*0.7));
+        gf.addColorStop(1, 'transparent');
+        ctx.fillStyle = gf;
+        ctx.beginPath();
+        ctx.arc(f.x*SCALE, f.y*SCALE, sz, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // 불씨
+      embers.forEach(e => {
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        e.vy += 0.04 * dt;
+        e.life -= dt * 0.015;
+        if(e.life <= 0) Object.assign(e, newEmber());
+        const alpha = Math.max(0, e.life) * 0.9;
+        ctx.fillStyle = `rgba(255,${Math.floor(150+e.life*100)},50,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(e.x*SCALE, e.y*SCALE, e.sz, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // 통나무
+      drawLog();
+
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  //  데이터 로드 및 렌더
+  // ══════════════════════════════════════════════════════════
+  let ALL_ITEMS = [];
   let currentCat = 'ALL';
-  let searchQuery = '';
+  let currentSearch = '';
 
-  async function loadTIL() {
+  async function loadData() {
     try {
-      const r = await fetch('/data/til.json');
-      const d = await r.json();
-      allItems = d.items || [];
-    } catch(e) { allItems = []; }
+      const data = await fetch('/data/til.json').then(r=>r.json());
+      ALL_ITEMS = data.items || [];
+    } catch(e) { ALL_ITEMS = []; }
     render();
-    updateStats();
     checkURLParam();
   }
 
-  function updateStats() {
-    const dev   = allItems.filter(t=>t.category==='DEV').length;
-    const paper = allItems.filter(t=>t.category==='PAPER').length;
-    const stack = allItems.filter(t=>t.category==='STACK').length;
-    const total = allItems.length;
-    document.getElementById('cnt-dev').textContent   = dev;
-    document.getElementById('cnt-paper').textContent = paper;
-    document.getElementById('cnt-stack').textContent = stack;
-    document.getElementById('cnt-all').textContent   = total;
-    document.getElementById('cnt-dev-tab').textContent   = dev;
-    document.getElementById('cnt-paper-tab').textContent = paper;
-    document.getElementById('cnt-stack-tab').textContent = stack;
-
-    // 히어로 아이콘
-    const icon = document.getElementById('til-hero-icon');
-    if(icon) {
-      if(total===0)       icon.textContent='🌱';
-      else if(total<5)    icon.textContent='🌿';
-      else if(total<15)   icon.textContent='🌸';
-      else if(total<30)   icon.textContent='🌻';
-      else if(total<60)   icon.textContent='🌳';
-      else                icon.textContent='🏡';
-    }
-  }
-
-  function getFiltered() {
-    let items = allItems;
-    if(currentCat !== 'ALL') items = items.filter(t=>t.category===currentCat);
-    if(searchQuery) {
-      const q = searchQuery.toLowerCase();
-      items = items.filter(t =>
-        t.title?.toLowerCase().includes(q) ||
-        t.summary?.toLowerCase().includes(q) ||
-        (t.tags||[]).some(tg=>tg.toLowerCase().includes(q))
-      );
-    }
-    return items;
-  }
-
   function render() {
-    const list = document.getElementById('til-list');
-    const items = getFiltered();
+    const items = ALL_ITEMS.filter(t => {
+      const catOk = currentCat==='ALL' || t.category===currentCat;
+      const q = currentSearch.toLowerCase();
+      const searchOk = !q ||
+        (t.title||'').toLowerCase().includes(q) ||
+        (t.summary||'').toLowerCase().includes(q) ||
+        (t.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      return catOk && searchOk;
+    });
+
+    const cnt = document.getElementById('result-count');
+    if(cnt) cnt.innerHTML = `<span>${items.length}</span> post${items.length!==1?'s':''} found`;
+
+    const container = document.getElementById('til-container');
     if(!items.length) {
-      list.innerHTML = `<div class="empty-state">
-        <span class="empty-state-icon">${currentCat==='ALL'?'🌱':'🔍'}</span>
-        <div class="empty-state-title">${searchQuery?'검색 결과가 없어요':'아직 TIL이 없어요'}</div>
-        <p class="empty-state-desc">${searchQuery?'다른 키워드로 검색해보세요.':'노션에서 첫 TIL을 작성해보세요!'}</p>
+      container.innerHTML = `<div class="empty-state">
+        <span class="empty-state-icon">🔥</span>
+        <div class="empty-state-title">No posts yet.</div>
       </div>`;
       return;
     }
-    const CE = {DEV:'💻',PAPER:'📄',STACK:'🔧'};
-    const CC = {DEV:'cat-dev',PAPER:'cat-paper',STACK:'cat-stack'};
-    list.innerHTML = `<div class="til-grid">${items.map(t=>`
-      <div class="til-card" data-cat="${esc(t.category||'DEV')}" onclick="openDetail('${esc(t.id)}')">
-        <span class="til-growth-icon">${GROWTH_ICONS[season]||'🌱'}</span>
-        <span class="til-cat-badge ${CC[t.category]||'cat-dev'}">${CE[t.category]||'📝'} ${esc(t.category||'DEV')}</span>
-        <div class="til-title">${esc(t.title)}</div>
-        ${t.summary?`<div class="til-summary">${esc(t.summary)}</div>`:''}
-        <div class="til-footer">
-          <span class="til-date">${t.date||''}</span>
-          <div class="til-tags">${(t.tags||[]).slice(0,2).map(tg=>`<span class="tag">${esc(tg)}</span>`).join('')}</div>
+
+    const CE = {DEV:'// DEV', PAPER:'§ PAPER', STACK:'⚙ STACK'};
+    container.innerHTML = `<div class="til-grid">${items.map(t=>`
+      <div class="til-card" onclick="openModal('${esc(t.id)}')">
+        <div class="til-card-cat"><span class="cat-dot"></span>${CE[t.category]||t.category||'TIL'}</div>
+        <div class="til-card-title">${esc(t.title)}</div>
+        <div class="til-card-summary">${esc(t.summary||'')}</div>
+        <div class="til-card-footer">
+          <span class="til-card-date">${t.date||''}</span>
+          <div class="til-tags">${(t.tags||[]).slice(0,3).map(tg=>`<span class="til-tag">${esc(tg)}</span>`).join('')}</div>
         </div>
       </div>`).join('')}</div>`;
   }
 
-  function filterCat(cat) {
-    currentCat = cat;
-    document.querySelectorAll('.cat-tab').forEach(b=>{
-      b.classList.toggle('active', b.dataset.cat===cat);
+  // ── 필터 이벤트 ─────────────────────────────────────────
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      render();
     });
-    render();
-  }
+  });
 
-  document.getElementById('search-input').addEventListener('input', e=>{
-    searchQuery = e.target.value.trim();
+  document.getElementById('search-input').addEventListener('input', e => {
+    currentSearch = e.target.value;
     render();
   });
 
-  // ══ 상세 모달 ══════════════════════════════════════════════
-  function openDetail(id) {
-    const item = allItems.find(t=>t.id===id);
-    if(!item) return;
-    const CE = {DEV:'💻',PAPER:'📄',STACK:'🔧'};
-    const CC = {DEV:'cat-dev',PAPER:'cat-paper',STACK:'cat-stack'};
-    const tags = (item.tags||[]).map(tg=>`<span class="tag">${esc(tg)}</span>`).join('');
-    const body = item.body ? renderMarkdown(item.body) : (item.summary ? `<p>${esc(item.summary)}</p>` : '<p style="color:var(--text-muted)">내용이 없습니다.</p>');
-    document.getElementById('modal-body').innerHTML = `
-      <div class="modal-title">${esc(item.title)}</div>
-      <div class="detail-meta">
-        <span class="til-cat-badge ${CC[item.category]||'cat-dev'}">${CE[item.category]||'📝'} ${esc(item.category||'DEV')}</span>
-        <span class="detail-date">${item.date||''}</span>
-        ${tags}
-      </div>
-      <div class="detail-body">${body}</div>
-      ${item.notionUrl?`<a class="notion-link" href="${esc(item.notionUrl)}" target="_blank">📝 노션에서 원본 보기 →</a>`:''}
-    `;
-    document.getElementById('modal-overlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    history.pushState({}, '', `?id=${id}`);
+  // ── 모달 ────────────────────────────────────────────────
+  function openModal(id) {
+    const t = ALL_ITEMS.find(x=>x.id===id); if(!t) return;
+    const CE = {DEV:'// DEV', PAPER:'§ PAPER', STACK:'⚙ STACK'};
+    document.getElementById('modal-cat').textContent   = CE[t.category]||t.category||'TIL';
+    document.getElementById('modal-title').textContent = t.title||'';
+    document.getElementById('modal-date').textContent  = t.date||'';
+    document.getElementById('modal-tags').innerHTML    = (t.tags||[]).map(tg=>`<span class="til-tag">${esc(tg)}</span>`).join('');
+    document.getElementById('modal-body').innerHTML    = renderMd(t.content||t.summary||'No content.');
+    const nl = document.getElementById('modal-notion-link');
+    if(t.url) { nl.href=t.url; nl.style.display='inline-flex'; }
+    else nl.style.display='none';
+    document.getElementById('modal-overlay').classList.add('open');
+    history.replaceState(null,'',`?id=${id}`);
   }
 
   function closeModal(e) {
-    if(e && e.target !== document.getElementById('modal-overlay') && e.type !== 'click') return;
-    if(e && e.currentTarget !== document.getElementById('modal-overlay') && e.target !== document.getElementById('modal-overlay')) {
-      if(!e.target.classList.contains('modal-close')) return;
+    if(e.target===document.getElementById('modal-overlay')) {
+      document.getElementById('modal-overlay').classList.remove('open');
+      history.replaceState(null,'',location.pathname);
     }
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.body.style.overflow = '';
-    history.pushState({}, '', window.location.pathname);
   }
-
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal({target:document.getElementById('modal-overlay')}); });
 
   function checkURLParam() {
     const id = new URLSearchParams(location.search).get('id');
-    if(id) openDetail(id);
+    if(id) openModal(id);
   }
 
-  // ══ 마크다운 렌더링 ════════════════════════════════════════
-  function renderMarkdown(md) {
+  // ── 마크다운 렌더 ────────────────────────────────────────
+  function renderMd(md) {
     return md
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/^### (.+)$/gm,'<h3>$1</h3>')
-      .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-      .replace(/^# (.+)$/gm,'<h1>$1</h1>')
-      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g,'<em>$1</em>')
-      .replace(/`([^`]+)`/g,'<code>$1</code>')
-      .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
-      .replace(/^- (.+)$/gm,'<li>$1</li>')
-      .replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>')
-      .replace(/\n\n/g,'</p><p>')
-      .replace(/^(?!<[hublp])(.+)$/gm,'<p>$1</p>');
+      .replace(/```(\w*)\n?([\s\S]*?)```/g, (_,l,c)=>`<pre><code class="lang-${l}">${c.trim()}</code></pre>`)
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm,  '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm,   '<h1>$1</h1>')
+      .replace(/^\> (.+)$/gm,  '<blockquote>$1</blockquote>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,    '<em>$1</em>')
+      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^(?!<[hupbl])(.+)$/gm, '<p>$1</p>')
+      .replace(/<p><\/p>/g, '');
   }
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -495,7 +716,7 @@
     document.getElementById('scroll-top')?.classList.toggle('visible',window.scrollY>300);
   });
 
-  loadTIL();
+  loadData();
   </script>
 </body>
 </html>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌾 SRE — Self-Refining Engine</title>
-  <meta name="description" content="AI 데이터 개발자의 학습 농장. 노션에서 쓰고, 여기서 자란다.">
+  <title>Hyunwoo Lee</title>
+  <meta name="description" content="Personal blog of Hyunwoo Lee — NLP, Fine-tuning, Reinforcement Learning, HCI.">
   <link rel="stylesheet" href="/assets/css/farm.css">
   <style>
     /* ── 농장 씬 (Canvas 기반) ──────────────────────── */
@@ -51,7 +51,9 @@
       font-size: 38px; flex-shrink: 0;
     }
     .profile-name { font-family: var(--font-pixel); font-size: 15px; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.4; }
-    .profile-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--gap-sm); }
+    .profile-greeting { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.4; }
+    .profile-greeting strong { color: var(--accent); }
+    .profile-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--gap-sm); }
     .profile-tags { display: flex; flex-wrap: wrap; gap: var(--gap-xs); }
 
     /* ── 성장 바 ─────────────────────────────────── */
@@ -133,7 +135,7 @@
 <body>
   <nav class="nav">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">🌾 SRE</a>
+      <a href="/" class="nav-logo">Hyunwoo Lee</a>
       <ul class="nav-links">
         <li><a href="/" class="active">HOME</a></li>
         <li><a href="/pages/til/">TIL</a></li>
@@ -161,12 +163,14 @@
     <div class="profile-header">
       <div class="profile-avatar">🧑‍🌾</div>
       <div>
-        <div class="profile-name">Self-Refining Engine</div>
-        <p class="profile-desc">AI 데이터 개발자의 학습 농장.<br>노션에서 쓰고, 여기서 자란다.</p>
+        <p class="profile-greeting">👋 Hi, I'm <strong>Hyunwoo Lee</strong>.</p>
+        <p class="profile-desc">I'm currently a student at Hankuk University of Foreign Studies, majoring in Social Science &amp; AI Convergence. My technical interests lie in NLP, Fine-tuning, and Reinforcement Learning, with a focus on HCI.</p>
+        <p class="profile-desc" style="margin-bottom:var(--gap-sm)">This blog is a personal archive of my technical explorations. I hope you find some interesting bits to read.</p>
         <div class="profile-tags">
-          <span class="tag">🌱 AI / Data / LLM</span>
-          <span class="tag">📚 TIL + 독서</span>
-          <span class="tag" id="sync-tag">⏰ 동기화 중...</span>
+          <span class="tag">NLP</span>
+          <span class="tag">Fine-tuning</span>
+          <span class="tag">RL</span>
+          <span class="tag">HCI</span>
         </div>
       </div>
     </div>
@@ -224,9 +228,8 @@
     <div id="til-wrap" style="margin-bottom:var(--gap-xl)">
       <div class="empty-state">
         <span class="empty-state-icon">🌱</span>
-        <div class="empty-state-title">아직 TIL이 없어요</div>
-        <p class="empty-state-desc">노션 TIL 데이터베이스에 글을 작성하고<br>Published를 체크하면 자동으로 나타납니다.</p>
-        <a href="/pages/til/" class="btn btn-primary">TIL 보러가기</a>
+        <div class="empty-state-title">No posts yet.</div>
+        <a href="/pages/til/" class="btn btn-primary">Go to TIL →</a>
       </div>
     </div>
 
@@ -238,25 +241,17 @@
     <div id="books-wrap">
       <div class="empty-state">
         <span class="empty-state-icon">📚</span>
-        <div class="empty-state-title">아직 독서 기록이 없어요</div>
-        <p class="empty-state-desc">노션 Books 데이터베이스에 책을 추가하고<br>Published를 체크하면 자동으로 나타납니다.</p>
-        <a href="/pages/life-os/" class="btn btn-primary">독서 기록 보러가기</a>
+        <div class="empty-state-title">No books yet.</div>
+        <a href="/pages/life-os/" class="btn btn-primary">Go to Books →</a>
       </div>
     </div>
 
-    <!-- 노션 배너 -->
-    <div class="notion-banner" style="margin-top:var(--gap-xl)">
-      <span class="notion-banner-icon">📝</span>
-      <div class="notion-banner-text">
-        노션에서 바로 작성하세요<br>
-        TIL/Books 데이터베이스에 글을 쓰고 Published를 체크하면 자동으로 여기에 반영됩니다.
-      </div>
-    </div>
+
 
   </div>
 
   <footer class="footer">
-    <div class="footer-text">🌾 Self-Refining Engine · Powered by Notion &amp; GitHub Pages</div>
+    <div class="footer-text">Hyunwoo Lee · Powered by Notion &amp; GitHub Pages</div>
     <ul class="footer-links">
       <li><a href="/pages/til/">TIL</a></li>
       <li><a href="/pages/life-os/">Books</a></li>
@@ -1078,14 +1073,7 @@
   //  동기화 태그
   // ══════════════════════════════════════════════════════════
   function setSyncTag() {
-    const tag=document.getElementById('sync-tag'); if(!tag) return;
-    const sync=TIL.lastSync;
-    if(!sync){ tag.textContent='⏰ 동기화 대기 중'; return; }
-    const diff=Math.floor((now-new Date(sync))/60000);
-    if(diff<1)      tag.textContent='⏰ 방금 동기화';
-    else if(diff<60) tag.textContent=`⏰ ${diff}분 전`;
-    else if(diff<1440) tag.textContent=`⏰ ${Math.floor(diff/60)}시간 전`;
-    else            tag.textContent=`⏰ ${Math.floor(diff/1440)}일 전`;
+    // 동기화 태그는 표시하지 않음 (노션 연동 전 더미 날짜 버그 방지)
   }
 
   // ══════════════════════════════════════════════════════════

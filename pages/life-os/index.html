@@ -3,199 +3,418 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 Books — SRE Farm</title>
-  <link rel="stylesheet" href="/assets/css/farm.css">
+  <title>Books — Hyunwoo Lee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ── Books 페이지 전용 ───────────────────────────── */
-    .books-hero {
-      background: linear-gradient(135deg, var(--gold-soft) 0%, var(--accent-soft) 100%);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-xl) var(--gap-lg);
-      margin-bottom: var(--gap-xl);
-      display: flex;
-      align-items: center;
-      gap: var(--gap-lg);
-    }
-    .books-hero-icon { font-size: 48px; animation: float 3s ease-in-out infinite; flex-shrink: 0; }
-    .books-hero-title { font-family: var(--font-pixel); font-size: 14px; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.6; }
-    .books-hero-desc  { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    /* ── 도서관 테마 변수 ──────────────────────────────── */
+    :root {
+      --lib-bg:       #0C0A08;
+      --lib-bg2:      #120E0A;
+      --lib-surface:  #1A140E;
+      --lib-card:     #201810;
+      --lib-border:   #3A2A18;
+      --lib-border2:  #5A4028;
 
-    /* 독서 통계 */
-    .reading-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--gap-md);
-      margin-bottom: var(--gap-xl);
+      --parchment:    #F0E6D0;
+      --parchment-dim:#C4AA88;
+      --parchment-muted: #8B7355;
+      --ink:          #2C1810;
+      --leather:      #8B4513;
+      --leather-light:'#A0522D';
+      --gold:         #C8960A;
+      --gold-light:   #E8B830;
+      --dust:         '#9E8B6A';
+      --lamp:         #FFD080;
+      --lamp-glow:    #FF9A20;
+      --spine1:       #8B2020;
+      --spine2:       #1A4A8B;
+      --spine3:       #2A6B2A;
+      --spine4:       #6B3A8B;
+      --spine5:       #8B6B1A;
+
+      --font-pixel:  'Press Start 2P', monospace;
+      --font-serif:  'Noto Serif KR', serif;
+      --font-sans:   'Noto Sans KR', sans-serif;
+      --radius:      6px;
+      --transition:  0.2s ease;
     }
-    .reading-stat {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: var(--gap-md);
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--lib-bg);
+      color: var(--parchment);
+      font-family: var(--font-serif);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── 배경 — 나무 책장 질감 ─────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px, transparent 28px,
+          rgba(58,42,24,0.12) 28px, rgba(58,42,24,0.12) 30px
+        ),
+        repeating-linear-gradient(
+          180deg,
+          transparent 0px, transparent 40px,
+          rgba(90,64,40,0.06) 40px, rgba(90,64,40,0.06) 42px
+        );
+      pointer-events: none;
+    }
+
+    /* ── 램프 글로우 ────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse at center top,
+        rgba(255,208,128,0.10) 0%,
+        rgba(255,154,32,0.05) 40%,
+        transparent 70%);
+      pointer-events: none; z-index: 0;
+      animation: lampFlicker 4s ease-in-out infinite;
+    }
+    @keyframes lampFlicker {
+      0%,100% { opacity: 0.8; }
+      25%      { opacity: 1; }
+      50%      { opacity: 0.7; }
+      75%      { opacity: 0.95; }
+    }
+
+    /* ── 네비게이션 ────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(12,10,8,0.94);
+      border-bottom: 1px solid var(--lib-border);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      max-width: 960px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-logo {
+      font-family: var(--font-pixel); font-size: 10px;
+      color: var(--gold-light); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-pixel); font-size: 8px;
+      color: var(--parchment-dim); text-decoration: none;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold-light); }
+
+    /* ── 페이지 래퍼 ───────────────────────────────────── */
+    .page-wrapper {
+      position: relative; z-index: 1;
+      max-width: 960px; margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* ── 헤더 (책장 씬) ────────────────────────────────── */
+    .lib-header {
       text-align: center;
-      transition: all var(--transition);
-    }
-    .reading-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-    .reading-stat-icon { font-size: 28px; margin-bottom: var(--gap-sm); }
-    .reading-stat-num  { font-family: var(--font-pixel); font-size: 20px; color: var(--accent); margin-bottom: 4px; }
-    .reading-stat-lbl  { font-family: var(--font-pixel); font-size: 7px; color: var(--text-muted); }
-
-    /* 현재 읽는 책 */
-    .reading-now {
-      background: var(--card-bg);
-      border: 2px solid var(--accent);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-lg);
-      margin-bottom: var(--gap-xl);
-      position: relative;
-      overflow: hidden;
-    }
-    .reading-now::before {
-      content: '📖 지금 읽는 중';
-      position: absolute;
-      top: var(--gap-sm);
-      right: var(--gap-md);
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--accent);
-      opacity: 0.7;
-    }
-    .reading-now-title { font-family: var(--font-pixel); font-size: 9px; color: var(--text-primary); margin-bottom: var(--gap-md); }
-    .reading-now-book  { display: flex; align-items: center; gap: var(--gap-md); }
-    .reading-now-cover {
-      width: 56px; height: 72px;
-      background: var(--accent-soft);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px; flex-shrink: 0;
-    }
-    .reading-now-info { flex: 1; }
-    .reading-now-name { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
-    .reading-now-author { font-size: 12px; color: var(--text-muted); margin-bottom: var(--gap-sm); }
-    .reading-progress-label {
-      display: flex; justify-content: space-between;
-      font-family: var(--font-pixel); font-size: 7px; color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    /* 책 카드 그리드 */
-    .books-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: var(--gap-md);
-    }
-
-    .book-card {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: var(--gap-md);
-      cursor: pointer;
-      transition: all var(--transition);
-      display: flex;
-      flex-direction: column;
-      gap: var(--gap-sm);
+      padding: 48px 20px 40px;
       position: relative;
     }
 
-    .book-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--accent);
+    /* 책장 Canvas */
+    #shelf-canvas {
+      display: block; margin: 0 auto 28px;
+      image-rendering: pixelated;
+      border-radius: var(--radius);
     }
 
-    .book-cover {
-      width: 100%;
-      height: 120px;
-      background: var(--accent-soft);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      margin-bottom: var(--gap-sm);
+    .lib-title {
+      font-family: var(--font-pixel); font-size: 18px;
+      color: var(--gold-light);
+      text-shadow: 0 0 20px rgba(200,150,10,0.5), 0 0 40px rgba(255,154,32,0.2);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
     }
-
-    .book-status-badge {
-      position: absolute;
-      top: var(--gap-sm);
-      right: var(--gap-sm);
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-    }
-    .status-done     { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
-    .status-reading  { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
-    .status-wishlist { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }
-
-    .book-title  { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .book-author { font-size: 12px; color: var(--text-muted); }
-    .book-genre  { font-family: var(--font-pixel); font-size: 7px; color: var(--accent); }
-
-    .book-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-      padding-top: var(--gap-sm);
-      border-top: 1px solid var(--card-border);
-    }
-
-    /* 상세 모달 */
-    .book-detail-cover {
-      width: 80px; height: 104px;
-      background: var(--accent-soft);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 44px; flex-shrink: 0;
-    }
-    .book-detail-header { display: flex; gap: var(--gap-lg); margin-bottom: var(--gap-lg); }
-    .book-detail-info { flex: 1; }
-    .book-detail-title  { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.4; }
-    .book-detail-author { font-size: 14px; color: var(--text-muted); margin-bottom: var(--gap-sm); }
-    .book-detail-meta   { display: flex; gap: var(--gap-sm); flex-wrap: wrap; margin-bottom: var(--gap-sm); }
-    .book-review {
-      background: var(--accent-soft);
-      border-left: 3px solid var(--accent);
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: var(--gap-md);
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.7;
+    .lib-subtitle {
+      font-family: var(--font-serif);
+      font-size: 13px; color: var(--parchment-dim);
       font-style: italic;
     }
 
-    /* 연간 목표 */
-    .year-goal {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: var(--radius-lg);
-      padding: var(--gap-lg);
-      margin-bottom: var(--gap-xl);
+    /* ── 통계 바 ───────────────────────────────────────── */
+    .lib-stats {
+      display: flex; gap: 1px;
+      background: var(--lib-border);
+      border: 1px solid var(--lib-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 28px;
     }
-    .year-goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--gap-md); }
-    .year-goal-title  { font-family: var(--font-pixel); font-size: 9px; color: var(--text-primary); }
-    .year-goal-num    { font-family: var(--font-pixel); font-size: 9px; color: var(--accent); }
+    .lib-stat {
+      flex: 1; text-align: center;
+      padding: 14px 10px;
+      background: var(--lib-surface);
+      transition: background var(--transition);
+    }
+    .lib-stat:hover { background: var(--lib-card); }
+    .lib-stat-value {
+      font-family: var(--font-pixel); font-size: 14px;
+      color: var(--gold-light); display: block; margin-bottom: 5px;
+    }
+    .lib-stat-label {
+      font-family: var(--font-pixel); font-size: 6px;
+      color: var(--parchment-muted);
+    }
 
-    @media (max-width: 600px) {
-      .books-hero { flex-direction: column; text-align: center; }
-      .reading-stats { grid-template-columns: repeat(3, 1fr); gap: var(--gap-sm); }
-      .books-grid { grid-template-columns: repeat(2, 1fr); }
+    /* ── 필터 바 ───────────────────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding: 14px 18px;
+      background: var(--lib-surface);
+      border: 1px solid var(--lib-border);
+      border-radius: var(--radius);
     }
-    @media (max-width: 400px) {
-      .books-grid { grid-template-columns: 1fr; }
+    .filter-label {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--parchment-muted); margin-right: 4px;
     }
+    .filter-btn {
+      font-family: var(--font-pixel); font-size: 7px;
+      padding: 6px 11px;
+      background: transparent;
+      border: 1px solid var(--lib-border);
+      border-radius: 3px;
+      color: var(--parchment-dim);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold-light); }
+    .filter-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--lib-bg);
+    }
+    .filter-sep { width: 1px; height: 20px; background: var(--lib-border); margin: 0 4px; }
+
+    /* ── 책 그리드 ─────────────────────────────────────── */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── 책 카드 ───────────────────────────────────────── */
+    .book-card {
+      background: var(--lib-card);
+      border: 1px solid var(--lib-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: flex; gap: 16px;
+    }
+    /* 책등 색상 줄 */
+    .book-card::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    }
+    .book-card[data-genre="TECH"]::before    { background: var(--spine2); }
+    .book-card[data-genre="DEV"]::before     { background: var(--spine3); }
+    .book-card[data-genre="GROWTH"]::before  { background: var(--spine4); }
+    .book-card[data-genre="GENERAL"]::before { background: var(--spine5); }
+
+    .book-card:hover {
+      border-color: var(--lib-border2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(200,150,10,0.08), 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    /* 책 표지 (픽셀 아이콘) */
+    .book-cover {
+      width: 52px; height: 68px; flex-shrink: 0;
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      position: relative;
+    }
+    .book-cover[data-genre="TECH"]    { background: linear-gradient(160deg, #1A3A6B, #0D2040); border: 1px solid #2A5A9B; }
+    .book-cover[data-genre="DEV"]     { background: linear-gradient(160deg, #1A4A1A, #0D2A0D); border: 1px solid #2A7A2A; }
+    .book-cover[data-genre="GROWTH"]  { background: linear-gradient(160deg, #4A1A6B, #2A0D40); border: 1px solid #7A2A9B; }
+    .book-cover[data-genre="GENERAL"] { background: linear-gradient(160deg, #6B4A1A, #402A0D); border: 1px solid #9B7A2A; }
+
+    .book-info { flex: 1; min-width: 0; }
+    .book-genre {
+      font-family: var(--font-pixel); font-size: 6px;
+      margin-bottom: 7px;
+    }
+    .book-genre[data-genre="TECH"]    { color: #4A8FD4; }
+    .book-genre[data-genre="DEV"]     { color: #4CAF50; }
+    .book-genre[data-genre="GROWTH"]  { color: #AB47BC; }
+    .book-genre[data-genre="GENERAL"] { color: var(--gold); }
+
+    .book-title {
+      font-family: var(--font-serif);
+      font-size: 14px; font-weight: 700;
+      color: var(--parchment);
+      margin-bottom: 4px;
+      line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .book-author {
+      font-family: var(--font-serif);
+      font-size: 12px; color: var(--parchment-muted);
+      font-style: italic; margin-bottom: 10px;
+    }
+    .book-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .book-status {
+      font-family: var(--font-pixel); font-size: 6px;
+      padding: 3px 7px; border-radius: 2px;
+    }
+    .book-status.done    { background: rgba(76,175,80,0.15); color: #4CAF50; border: 1px solid rgba(76,175,80,0.3); }
+    .book-status.reading { background: rgba(255,152,0,0.15); color: #FF9800; border: 1px solid rgba(255,152,0,0.3); }
+    .book-status.wish    { background: rgba(158,158,158,0.1); color: #9E9E9E; border: 1px solid rgba(158,158,158,0.2); }
+    .book-rating { display: flex; gap: 2px; }
+    .book-star { font-size: 11px; color: var(--lib-border2); }
+    .book-star.filled { color: var(--gold-light); }
+
+    /* ── 빈 상태 ───────────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 80px 20px;
+      color: var(--parchment-muted);
+    }
+    .empty-state-icon { font-size: 40px; display: block; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state-title {
+      font-family: var(--font-pixel); font-size: 10px;
+      color: var(--parchment-dim); margin-bottom: 8px;
+    }
+
+    /* ── 상세 모달 ─────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--lib-card);
+      border: 1px solid var(--lib-border2);
+      border-radius: var(--radius);
+      max-width: 600px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 0 60px rgba(200,150,10,0.12), 0 20px 60px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    .modal-header {
+      padding: 28px 28px 20px;
+      border-bottom: 1px solid var(--lib-border);
+      position: sticky; top: 0;
+      background: var(--lib-card); z-index: 10;
+    }
+    .modal-genre {
+      font-family: var(--font-pixel); font-size: 7px;
+      margin-bottom: 10px;
+    }
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 20px; font-weight: 700;
+      color: var(--parchment); line-height: 1.4; margin-bottom: 6px;
+    }
+    .modal-author {
+      font-family: var(--font-serif);
+      font-size: 13px; color: var(--parchment-muted);
+      font-style: italic; margin-bottom: 12px;
+    }
+    .modal-meta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .modal-body {
+      padding: 24px 28px;
+      font-family: var(--font-serif);
+      font-size: 14px; color: var(--parchment-dim);
+      line-height: 1.9;
+    }
+    .modal-body .review-label {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--gold); margin-bottom: 12px; display: block;
+    }
+    .modal-body .pages-info {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--parchment-muted); margin-top: 16px;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: 1px solid var(--lib-border);
+      border-radius: 3px; width: 32px; height: 32px;
+      color: var(--parchment-dim); cursor: pointer; font-size: 16px;
+      transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { border-color: var(--gold); color: var(--gold-light); }
+    .modal-notion-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--parchment-muted); text-decoration: none;
+      border: 1px solid var(--lib-border);
+      border-radius: 3px; padding: 6px 10px;
+      margin: 0 28px 24px;
+      transition: all var(--transition);
+    }
+    .modal-notion-link:hover { border-color: var(--gold); color: var(--gold-light); }
+
+    /* ── 결과 카운트 ───────────────────────────────────── */
+    .result-count {
+      font-family: var(--font-pixel); font-size: 8px;
+      color: var(--parchment-muted); margin-bottom: 20px;
+    }
+    .result-count span { color: var(--gold-light); }
+
+    /* ── 푸터 ──────────────────────────────────────────── */
+    .footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--lib-border);
+      padding: 24px 20px; text-align: center;
+    }
+    .footer-text {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--parchment-muted); margin-bottom: 12px;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 20px; list-style: none; }
+    .footer-links a {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--parchment-muted); text-decoration: none;
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: var(--gold-light); }
+
+    /* ── 스크롤 탑 ─────────────────────────────────────── */
+    #scroll-top {
+      position: fixed; bottom: 24px; right: 24px; z-index: 50;
+      width: 40px; height: 40px;
+      background: var(--lib-card); border: 1px solid var(--lib-border2);
+      border-radius: var(--radius); color: var(--gold-light);
+      cursor: pointer; font-size: 16px;
+      display: none; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    #scroll-top.visible { display: flex; }
+    #scroll-top:hover { background: var(--gold); color: var(--lib-bg); border-color: var(--gold); }
   </style>
 </head>
 <body>
   <nav class="nav">
     <div class="nav-inner">
-      <a href="/" class="nav-logo">🌾 SRE</a>
+      <a href="/" class="nav-logo">Hyunwoo Lee</a>
       <ul class="nav-links">
         <li><a href="/">HOME</a></li>
         <li><a href="/pages/til/">TIL</a></li>
@@ -206,89 +425,83 @@
 
   <div class="page-wrapper">
 
-    <!-- 히어로 -->
-    <div class="books-hero">
-      <span class="books-hero-icon">📚</span>
-      <div>
-        <div class="books-hero-title">독서 기록</div>
-        <p class="books-hero-desc">노션에서 기록한 독서 목록이 자동으로 여기에 수확됩니다.<br>TECH · DEV · GROWTH · GENERAL 장르로 분류됩니다.</p>
+    <!-- 헤더 책장 씬 -->
+    <div class="lib-header">
+      <canvas id="shelf-canvas" width="480" height="130"></canvas>
+      <h1 class="lib-title">BOOKS</h1>
+      <p class="lib-subtitle">A quiet corner of the library, where every book leaves a mark.</p>
+    </div>
+
+    <!-- 통계 -->
+    <div class="lib-stats">
+      <div class="lib-stat">
+        <span class="lib-stat-value" id="stat-total">0</span>
+        <span class="lib-stat-label">TOTAL</span>
+      </div>
+      <div class="lib-stat">
+        <span class="lib-stat-value" id="stat-done">0</span>
+        <span class="lib-stat-label">FINISHED</span>
+      </div>
+      <div class="lib-stat">
+        <span class="lib-stat-value" id="stat-reading">0</span>
+        <span class="lib-stat-label">READING</span>
+      </div>
+      <div class="lib-stat">
+        <span class="lib-stat-value" id="stat-wish">0</span>
+        <span class="lib-stat-label">WISHLIST</span>
       </div>
     </div>
 
-    <!-- 독서 통계 -->
-    <div class="reading-stats">
-      <div class="reading-stat">
-        <div class="reading-stat-icon">✅</div>
-        <div class="reading-stat-num" id="cnt-done">0</div>
-        <div class="reading-stat-lbl">완독</div>
-      </div>
-      <div class="reading-stat">
-        <div class="reading-stat-icon">📖</div>
-        <div class="reading-stat-num" id="cnt-reading">0</div>
-        <div class="reading-stat-lbl">읽는 중</div>
-      </div>
-      <div class="reading-stat">
-        <div class="reading-stat-icon">🌟</div>
-        <div class="reading-stat-num" id="cnt-wish">0</div>
-        <div class="reading-stat-lbl">위시리스트</div>
-      </div>
+    <!-- 필터 바 -->
+    <div class="filter-bar">
+      <span class="filter-label">STATUS</span>
+      <button class="filter-btn active" data-status="ALL">ALL</button>
+      <button class="filter-btn" data-status="완독">FINISHED</button>
+      <button class="filter-btn" data-status="읽는 중">READING</button>
+      <button class="filter-btn" data-status="위시리스트">WISHLIST</button>
+      <div class="filter-sep"></div>
+      <span class="filter-label">GENRE</span>
+      <button class="filter-btn" data-genre="ALL">ALL</button>
+      <button class="filter-btn" data-genre="TECH">TECH</button>
+      <button class="filter-btn" data-genre="DEV">DEV</button>
+      <button class="filter-btn" data-genre="GROWTH">GROWTH</button>
+      <button class="filter-btn" data-genre="GENERAL">GENERAL</button>
     </div>
 
-    <!-- 연간 목표 -->
-    <div class="year-goal" id="year-goal-wrap">
-      <div class="year-goal-header">
-        <span class="year-goal-title">✦ <span id="current-year">2025</span>년 독서 목표</span>
-        <span class="year-goal-num"><span id="goal-progress">0</span> / <span id="goal-target">20</span>권</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="goal-fill" style="width:0%"></div>
-      </div>
-    </div>
-
-    <!-- 현재 읽는 책 -->
-    <div id="reading-now-wrap"></div>
-
-    <!-- 필터 -->
-    <div class="filter-bar" id="status-filter">
-      <button class="filter-btn active" data-status="ALL" onclick="filterStatus('ALL')">🌾 전체</button>
-      <button class="filter-btn" data-status="읽는 중" onclick="filterStatus('읽는 중')">📖 읽는 중</button>
-      <button class="filter-btn" data-status="완독" onclick="filterStatus('완독')">✅ 완독</button>
-      <button class="filter-btn" data-status="위시리스트" onclick="filterStatus('위시리스트')">🌟 위시리스트</button>
-    </div>
-
-    <!-- 장르 필터 -->
-    <div class="filter-bar" id="genre-filter">
-      <button class="filter-btn active" data-genre="ALL" onclick="filterGenre('ALL')">전체 장르</button>
-      <button class="filter-btn" data-genre="TECH" onclick="filterGenre('TECH')">🔬 TECH</button>
-      <button class="filter-btn" data-genre="DEV" onclick="filterGenre('DEV')">💻 DEV</button>
-      <button class="filter-btn" data-genre="GROWTH" onclick="filterGenre('GROWTH')">🌱 GROWTH</button>
-      <button class="filter-btn" data-genre="GENERAL" onclick="filterGenre('GENERAL')">📖 GENERAL</button>
-    </div>
+    <!-- 결과 카운트 -->
+    <div class="result-count" id="result-count"></div>
 
     <!-- 책 목록 -->
-    <div id="books-list">
+    <div id="books-container">
       <div class="empty-state">
         <span class="empty-state-icon">📚</span>
-        <div class="empty-state-title">아직 독서 기록이 없어요</div>
-        <p class="empty-state-desc">노션 Books 데이터베이스에 책을 추가하고<br>Published를 체크하면 자동으로 나타납니다.</p>
+        <div class="empty-state-title">The shelves await.</div>
       </div>
     </div>
 
   </div>
 
   <!-- 상세 모달 -->
-  <div id="modal-overlay" class="modal-overlay" style="display:none" onclick="closeModal(event)">
-    <div class="modal" id="modal-content">
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <div id="modal-body"></div>
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-genre" id="modal-genre"></div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-author" id="modal-author"></div>
+        <div class="modal-meta" id="modal-meta"></div>
+        <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <a class="modal-notion-link" id="modal-notion-link" href="#" target="_blank">📝 View in Notion →</a>
     </div>
   </div>
 
   <footer class="footer">
-    <div class="footer-text">🌾 Self-Refining Engine · Powered by Notion &amp; GitHub Pages</div>
+    <div class="footer-text">Hyunwoo Lee · Powered by Notion &amp; GitHub Pages</div>
     <ul class="footer-links">
-      <li><a href="/">HOME</a></li>
+      <li><a href="/">Home</a></li>
       <li><a href="/pages/til/">TIL</a></li>
+      <li><a href="/pages/life-os/">Books</a></li>
       <li><a href="https://github.com/hyunNus/hyunNus.github.io" target="_blank">GitHub</a></li>
     </ul>
   </footer>
@@ -296,162 +509,313 @@
   <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
   <script>
-  // ══ 계절 ══════════════════════════════════════════════════
-  const now = new Date();
-  const m = now.getMonth()+1;
-  const season = m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';
-  document.documentElement.setAttribute('data-season', season);
-  document.getElementById('current-year').textContent = now.getFullYear();
+  // ══════════════════════════════════════════════════════════
+  //  책장 Canvas 씬
+  // ══════════════════════════════════════════════════════════
+  (function() {
+    const canvas = document.getElementById('shelf-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const S = 2; // scale
 
-  // ══ 데이터 ════════════════════════════════════════════════
-  let allBooks = [];
+    function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x*S,y*S,w*S,h*S); }
+
+    // 책 색상 팔레트
+    const BOOK_COLORS = [
+      ['#8B2020','#C43030','#6B1010'],
+      ['#1A4A8B','#2A6ABB','#0D2A6B'],
+      ['#2A6B2A','#3A9B3A','#1A4B1A'],
+      ['#6B3A8B','#9B5ABB','#4B1A6B'],
+      ['#8B6B1A','#C49B2A','#6B4B0A'],
+      ['#8B3A5A','#BB5A7A','#6B1A3A'],
+      ['#1A6B6B','#2A9B9B','#0A4B4B'],
+      ['#6B4A1A','#9B6A2A','#4B2A0A'],
+    ];
+
+    // 책 데이터 (랜덤 생성)
+    const SHELF_BOOKS = Array.from({length:22}, (_, i) => {
+      const c = BOOK_COLORS[i % BOOK_COLORS.length];
+      return {
+        w: 8 + Math.floor(Math.random()*8),
+        h: 42 + Math.floor(Math.random()*18),
+        color: c[0], colorL: c[1], colorD: c[2],
+        tilt: (Math.random()-0.5)*3,
+      };
+    });
+
+    // 책장 배경
+    function drawShelf() {
+      // 배경
+      ctx.fillStyle = '#0C0A08';
+      ctx.fillRect(0, 0, W, H);
+
+      // 나무 책장 배경 패널
+      ctx.fillStyle = '#1A1008';
+      ctx.fillRect(0, 0, W, H-20*S);
+
+      // 나무 결
+      for(let i=0; i<W; i+=S*12) {
+        ctx.fillStyle = 'rgba(58,42,24,0.08)';
+        ctx.fillRect(i, 0, S, H);
+      }
+
+      // 책장 선반 (위/아래)
+      const shelfY = H - 20*S;
+      ctx.fillStyle = '#3A2A18';
+      ctx.fillRect(0, shelfY, W, 4*S);
+      ctx.fillStyle = '#5A4028';
+      ctx.fillRect(0, shelfY, W, S);
+      ctx.fillStyle = '#2A1A08';
+      ctx.fillRect(0, shelfY+3*S, W, S);
+
+      // 바닥 그림자
+      const shad = ctx.createLinearGradient(0, shelfY+4*S, 0, H);
+      shad.addColorStop(0, 'rgba(0,0,0,0.4)');
+      shad.addColorStop(1, '#0C0A08');
+      ctx.fillStyle = shad;
+      ctx.fillRect(0, shelfY+4*S, W, H-shelfY-4*S);
+
+      // 램프 글로우
+      const lampX = W * 0.78;
+      const lampGlow = ctx.createRadialGradient(lampX, shelfY, 0, lampX, shelfY, 80*S);
+      lampGlow.addColorStop(0, 'rgba(255,208,128,0.18)');
+      lampGlow.addColorStop(0.4, 'rgba(255,154,32,0.06)');
+      lampGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = lampGlow;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // 책들 그리기
+    function drawBooks() {
+      const shelfY = (H/S) - 20;
+      let x = 4;
+      SHELF_BOOKS.forEach((b, i) => {
+        if(x + b.w > W/S - 4) return;
+        const bookY = shelfY - b.h;
+
+        ctx.save();
+        ctx.translate((x + b.w/2)*S, shelfY*S);
+        ctx.rotate(b.tilt * Math.PI/180);
+        ctx.translate(-(x + b.w/2)*S, -shelfY*S);
+
+        // 책 본체
+        px(x, bookY, b.w, b.h, b.color);
+        // 책 왼쪽 하이라이트
+        px(x, bookY, 1, b.h, b.colorL);
+        // 책 상단
+        px(x, bookY, b.w, 1, b.colorL);
+        // 책 오른쪽 그림자
+        px(x+b.w-1, bookY, 1, b.h, b.colorD);
+        // 책 제목 줄 (장식)
+        if(b.h > 50) {
+          px(x+1, bookY+6, b.w-2, 1, b.colorL);
+          px(x+1, bookY+8, b.w-2, 1, b.colorD);
+        }
+        // 페이지 (오른쪽)
+        ctx.fillStyle = 'rgba(240,230,208,0.15)';
+        ctx.fillRect((x+b.w)*S, (bookY+2)*S, S, (b.h-4)*S);
+
+        ctx.restore();
+        x += b.w + 1;
+      });
+    }
+
+    // 책갈피 (몇 개)
+    function drawBookmarks() {
+      const shelfY = (H/S) - 20;
+      [3, 8, 15].forEach(idx => {
+        if(idx >= SHELF_BOOKS.length) return;
+        let x = 4;
+        for(let i=0; i<idx; i++) x += SHELF_BOOKS[i].w + 1;
+        const b = SHELF_BOOKS[idx];
+        const bookY = shelfY - b.h;
+        const bmX = x + Math.floor(b.w/2);
+        px(bmX, bookY-4, 2, 6, '#C8960A');
+        px(bmX, bookY+2, 2, 1, '#A07010');
+      });
+    }
+
+    // 먼지 파티클
+    const dusts = Array.from({length:12}, ()=>({
+      x: Math.random()*W, y: Math.random()*(H-30*S),
+      vx: (Math.random()-0.5)*0.3, vy: -Math.random()*0.2,
+      op: Math.random()*0.3+0.05, sz: Math.random()*2+1,
+    }));
+
+    function drawDust() {
+      dusts.forEach(d => {
+        ctx.fillStyle = `rgba(158,139,106,${d.op})`;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.sz, 0, Math.PI*2);
+        ctx.fill();
+        d.x += d.vx; d.y += d.vy;
+        if(d.y < 0) { d.y = H-25*S; d.x = Math.random()*W; }
+        if(d.x < 0 || d.x > W) d.x = Math.random()*W;
+      });
+    }
+
+    // 램프 깜빡임
+    let lampPhase = 0;
+    function drawLamp() {
+      lampPhase += 0.02;
+      const intensity = 0.15 + Math.sin(lampPhase)*0.03 + Math.sin(lampPhase*3.7)*0.01;
+      const lampX = W * 0.78;
+      const shelfY = H - 20*S;
+      const lampGlow = ctx.createRadialGradient(lampX, shelfY, 0, lampX, shelfY, 100);
+      lampGlow.addColorStop(0, `rgba(255,208,128,${intensity})`);
+      lampGlow.addColorStop(0.5, `rgba(255,154,32,${intensity*0.4})`);
+      lampGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = lampGlow;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function render() {
+      drawShelf();
+      drawBooks();
+      drawBookmarks();
+      drawDust();
+      drawLamp();
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  //  데이터 로드 및 렌더
+  // ══════════════════════════════════════════════════════════
+  let ALL_ITEMS = [];
   let currentStatus = 'ALL';
   let currentGenre  = 'ALL';
 
-  const GENRE_EMOJI  = {TECH:'🔬',DEV:'💻',GROWTH:'🌱',GENERAL:'📖'};
-  const STATUS_CLASS = {'완독':'status-done','읽는 중':'status-reading','위시리스트':'status-wishlist'};
-
-  async function loadBooks() {
+  async function loadData() {
     try {
-      const r = await fetch('/data/books.json');
-      const d = await r.json();
-      allBooks = d.items || [];
-    } catch(e) { allBooks = []; }
-    updateStats();
-    renderReadingNow();
-    renderGoal();
+      const data = await fetch('/data/books.json').then(r=>r.json());
+      ALL_ITEMS = data.items || [];
+    } catch(e) { ALL_ITEMS = []; }
+    setStats();
     render();
     checkURLParam();
   }
 
-  function updateStats() {
-    document.getElementById('cnt-done').textContent    = allBooks.filter(b=>b.status==='완독').length;
-    document.getElementById('cnt-reading').textContent = allBooks.filter(b=>b.status==='읽는 중').length;
-    document.getElementById('cnt-wish').textContent    = allBooks.filter(b=>b.status==='위시리스트').length;
+  function setStats() {
+    const items = ALL_ITEMS;
+    anim('stat-total',   items.length);
+    anim('stat-done',    items.filter(b=>b.status==='완독').length);
+    anim('stat-reading', items.filter(b=>b.status==='읽는 중').length);
+    anim('stat-wish',    items.filter(b=>b.status==='위시리스트').length);
   }
-
-  function renderGoal() {
-    const done = allBooks.filter(b=>b.status==='완독').length;
-    const goal = 20;
-    const pct  = Math.min(100, (done/goal)*100);
-    document.getElementById('goal-progress').textContent = done;
-    document.getElementById('goal-target').textContent   = goal;
-    setTimeout(()=>{ document.getElementById('goal-fill').style.width = pct+'%'; }, 300);
-  }
-
-  function renderReadingNow() {
-    const reading = allBooks.filter(b=>b.status==='읽는 중');
-    const wrap = document.getElementById('reading-now-wrap');
-    if(!reading.length) { wrap.innerHTML=''; return; }
-    const b = reading[0];
-    const pct = b.pages && b.currentPage ? Math.round((b.currentPage/b.pages)*100) : 0;
-    wrap.innerHTML = `
-      <div class="reading-now" style="margin-bottom:var(--gap-xl)">
-        <div class="reading-now-title">✦ 지금 읽는 중</div>
-        <div class="reading-now-book">
-          <div class="reading-now-cover">${GENRE_EMOJI[b.genre]||'📖'}</div>
-          <div class="reading-now-info">
-            <div class="reading-now-name">${esc(b.title)}</div>
-            <div class="reading-now-author">${esc(b.author||'')}</div>
-            ${b.pages?`
-            <div class="reading-progress-label">
-              <span>진행률</span>
-              <span>${b.currentPage||0} / ${b.pages}쪽 (${pct}%)</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-            `:''}
-          </div>
-        </div>
-      </div>`;
-  }
-
-  function getFiltered() {
-    let items = allBooks;
-    if(currentStatus !== 'ALL') items = items.filter(b=>b.status===currentStatus);
-    if(currentGenre  !== 'ALL') items = items.filter(b=>b.genre===currentGenre);
-    return items;
+  function anim(id, target) {
+    const el=document.getElementById(id); if(!el) return;
+    let c=0; const step=Math.max(1,Math.ceil(target/30));
+    const t=setInterval(()=>{ c=Math.min(c+step,target); el.textContent=c; if(c>=target) clearInterval(t); },40);
   }
 
   function render() {
-    const list  = document.getElementById('books-list');
-    const items = getFiltered();
+    const items = ALL_ITEMS.filter(b => {
+      const sOk = currentStatus==='ALL' || b.status===currentStatus;
+      const gOk = currentGenre==='ALL'  || b.genre===currentGenre;
+      return sOk && gOk;
+    });
+
+    const cnt = document.getElementById('result-count');
+    if(cnt) cnt.innerHTML = `<span>${items.length}</span> book${items.length!==1?'s':''} found`;
+
+    const container = document.getElementById('books-container');
     if(!items.length) {
-      list.innerHTML = `<div class="empty-state">
+      container.innerHTML = `<div class="empty-state">
         <span class="empty-state-icon">📚</span>
-        <div class="empty-state-title">책이 없어요</div>
-        <p class="empty-state-desc">노션에서 책을 추가해보세요!</p>
+        <div class="empty-state-title">The shelves await.</div>
       </div>`;
       return;
     }
-    list.innerHTML = `<div class="books-grid">${items.map(b=>`
-      <div class="book-card" onclick="openDetail('${esc(b.id)}')">
-        <span class="book-status-badge ${STATUS_CLASS[b.status]||'status-wishlist'}">${b.status||'위시리스트'}</span>
-        <div class="book-cover">${GENRE_EMOJI[b.genre]||'📖'}</div>
-        <div class="book-genre">${b.genre||'GENERAL'}</div>
-        <div class="book-title">${esc(b.title)}</div>
-        <div class="book-author">${esc(b.author||'')}</div>
-        <div class="book-footer">
-          <div class="stars">${b.rating?Array.from({length:5},(_,i)=>`<span class="star${i<b.rating?' filled':''}" >★</span>`).join(''):'<span style="font-family:var(--font-pixel);font-size:7px;color:var(--text-muted)">미평가</span>'}</div>
-          ${b.pages?`<span style="font-family:var(--font-pixel);font-size:7px;color:var(--text-muted)">${b.pages}쪽</span>`:''}
+
+    const GE = {TECH:'🔬 TECH', DEV:'💻 DEV', GROWTH:'🌱 GROWTH', GENERAL:'📖 GENERAL'};
+    const GI = {TECH:'🔬', DEV:'💻', GROWTH:'🌱', GENERAL:'📖'};
+    const SC = {'완독':'done', '읽는 중':'reading', '위시리스트':'wish'};
+    const SL = {'완독':'FINISHED', '읽는 중':'READING', '위시리스트':'WISHLIST'};
+
+    container.innerHTML = `<div class="books-grid">${items.map(b=>`
+      <div class="book-card" data-genre="${esc(b.genre||'GENERAL')}" onclick="openModal('${esc(b.id)}')">
+        <div class="book-cover" data-genre="${esc(b.genre||'GENERAL')}">${GI[b.genre]||'📖'}</div>
+        <div class="book-info">
+          <div class="book-genre" data-genre="${esc(b.genre||'GENERAL')}">${GE[b.genre]||b.genre||'GENERAL'}</div>
+          <div class="book-title">${esc(b.title)}</div>
+          <div class="book-author">${esc(b.author||'')}</div>
+          <div class="book-footer">
+            <span class="book-status ${SC[b.status]||'wish'}">${SL[b.status]||b.status||''}</span>
+            <div class="book-rating">${renderStars(b.rating)}</div>
+          </div>
         </div>
       </div>`).join('')}</div>`;
   }
 
-  function filterStatus(s) {
-    currentStatus = s;
-    document.querySelectorAll('#status-filter .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.status===s));
-    render();
+  function renderStars(rating) {
+    const r = parseInt(rating)||0;
+    return Array.from({length:5}, (_,i)=>
+      `<span class="book-star${i<r?' filled':''}">${i<r?'★':'☆'}</span>`
+    ).join('');
   }
 
-  function filterGenre(g) {
-    currentGenre = g;
-    document.querySelectorAll('#genre-filter .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.genre===g));
-    render();
-  }
+  // ── 필터 이벤트 ─────────────────────────────────────────
+  document.querySelectorAll('[data-status]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-status]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStatus = btn.dataset.status;
+      render();
+    });
+  });
 
-  // ══ 상세 모달 ══════════════════════════════════════════════
-  function openDetail(id) {
-    const b = allBooks.find(b=>b.id===id);
-    if(!b) return;
-    const pct = b.pages && b.currentPage ? Math.round((b.currentPage/b.pages)*100) : 0;
-    document.getElementById('modal-body').innerHTML = `
-      <div class="modal-title">${esc(b.title)}</div>
-      <div class="book-detail-header">
-        <div class="book-detail-cover">${GENRE_EMOJI[b.genre]||'📖'}</div>
-        <div class="book-detail-info">
-          <div class="book-detail-title">${esc(b.title)}</div>
-          <div class="book-detail-author">${esc(b.author||'')}</div>
-          <div class="book-detail-meta">
-            <span class="book-status-badge ${STATUS_CLASS[b.status]||'status-wishlist'}">${b.status||'위시리스트'}</span>
-            <span class="tag">${b.genre||'GENERAL'}</span>
-          </div>
-          ${b.rating?`<div class="stars">${Array.from({length:5},(_,i)=>`<span class="star${i<b.rating?' filled':''}">★</span>`).join('')}</div>`:''}
-          ${b.pages?`<div style="margin-top:var(--gap-sm)">
-            <div class="reading-progress-label"><span>진행률</span><span>${b.currentPage||b.pages} / ${b.pages}쪽</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${pct||100}%"></div></div>
-          </div>`:''}
-        </div>
-      </div>
-      ${b.review?`<div class="book-review">${esc(b.review)}</div>`:''}
-      ${b.notionUrl?`<a class="notion-link" href="${esc(b.notionUrl)}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-pixel);font-size:7px;color:var(--text-muted);text-decoration:none;padding:6px 10px;border:1px solid var(--card-border);border-radius:var(--radius-sm);margin-top:var(--gap-md)">📝 노션에서 원본 보기 →</a>`:''}
-    `;
-    document.getElementById('modal-overlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    history.pushState({}, '', `?id=${id}`);
+  document.querySelectorAll('[data-genre]').forEach(btn => {
+    if(!btn.classList.contains('filter-btn')) return;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-genre].filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentGenre = btn.dataset.genre;
+      render();
+    });
+  });
+
+  // ── 모달 ────────────────────────────────────────────────
+  function openModal(id) {
+    const b = ALL_ITEMS.find(x=>x.id===id); if(!b) return;
+    const GE = {TECH:'🔬 TECH', DEV:'💻 DEV', GROWTH:'🌱 GROWTH', GENERAL:'📖 GENERAL'};
+    const SC = {'완독':'done','읽는 중':'reading','위시리스트':'wish'};
+    const SL = {'완독':'FINISHED','읽는 중':'READING','위시리스트':'WISHLIST'};
+    document.getElementById('modal-genre').textContent  = GE[b.genre]||b.genre||'';
+    document.getElementById('modal-genre').setAttribute('data-genre', b.genre||'GENERAL');
+    document.getElementById('modal-title').textContent  = b.title||'';
+    document.getElementById('modal-author').textContent = b.author||'';
+    document.getElementById('modal-meta').innerHTML =
+      `<span class="book-status ${SC[b.status]||'wish'}">${SL[b.status]||b.status||''}</span>
+       <div class="book-rating">${renderStars(b.rating)}</div>`;
+    const body = document.getElementById('modal-body');
+    body.innerHTML = '';
+    if(b.review) {
+      body.innerHTML = `<span class="review-label">✦ REVIEW</span>${esc(b.review).replace(/\n/g,'<br>')}`;
+    } else {
+      body.innerHTML = `<span style="color:var(--parchment-muted);font-style:italic">No review yet.</span>`;
+    }
+    if(b.pages) {
+      body.innerHTML += `<div class="pages-info">📄 ${b.pages} pages</div>`;
+    }
+    const nl = document.getElementById('modal-notion-link');
+    if(b.url) { nl.href=b.url; nl.style.display='inline-flex'; }
+    else nl.style.display='none';
+    document.getElementById('modal-overlay').classList.add('open');
+    history.replaceState(null,'',`?id=${id}`);
   }
 
   function closeModal(e) {
-    if(e && e.target !== document.getElementById('modal-overlay') && !e.target?.classList.contains('modal-close')) return;
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.body.style.overflow = '';
-    history.pushState({}, '', window.location.pathname);
+    if(e.target===document.getElementById('modal-overlay')) {
+      document.getElementById('modal-overlay').classList.remove('open');
+      history.replaceState(null,'',location.pathname);
+    }
   }
-
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') { document.getElementById('modal-overlay').style.display='none'; document.body.style.overflow=''; } });
 
   function checkURLParam() {
     const id = new URLSearchParams(location.search).get('id');
-    if(id) openDetail(id);
+    if(id) openModal(id);
   }
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -460,7 +824,7 @@
     document.getElementById('scroll-top')?.classList.toggle('visible',window.scrollY>300);
   });
 
-  loadBooks();
+  loadData();
   </script>
 </body>
 </html>
