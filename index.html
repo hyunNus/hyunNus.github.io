@@ -3,356 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SRE | Self-Refining Engine</title>
-  <meta name="description" content="AI 데이터 개발자의 기술 블로그 & Life OS — Self-Refining Engine">
-  <meta property="og:title" content="SRE | Self-Refining Engine">
-  <meta property="og:description" content="AI 데이터 개발자의 픽셀아트 개인 대시보드">
-  <meta property="og:type" content="website">
+  <title>🌾 SRE — Self-Refining Engine</title>
+  <meta name="description" content="AI 데이터 개발자의 TIL과 독서 기록. 노션으로 쓰고, 여기서 읽는다.">
   <link rel="stylesheet" href="assets/css/pixel-system.css">
-  <link rel="stylesheet" href="assets/css/home.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%231a1a2e'/><rect x='8' y='8' width='16' height='16' fill='%23ffd700'/><rect x='12' y='12' width='8' height='8' fill='%231a1a2e'/></svg>">
+  <style>
+    .hero { padding: var(--gap-2xl) 0 var(--gap-xl); border-bottom: 2px solid var(--border-mid); }
+    .hero-inner { display: flex; align-items: flex-start; gap: var(--gap-xl); }
+    .hero-avatar { flex-shrink: 0; width: 80px; height: 80px; background: var(--bg-surface); border: 2px solid var(--border-warm); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+    .hero-avatar::after { content: ''; position: absolute; bottom: -4px; right: -4px; width: 100%; height: 100%; background: var(--border-warm); border-radius: 4px; z-index: -1; }
+    .hero-content { flex: 1; }
+    .hero-name { font-family: var(--font-pixel); font-size: clamp(20px, 5vw, 32px); color: var(--gold); margin-bottom: var(--gap-sm); }
+    .hero-tagline { font-size: 15px; color: var(--text-secondary); margin-bottom: var(--gap-md); line-height: 1.6; }
+    .hero-meta { display: flex; gap: var(--gap-md); flex-wrap: wrap; align-items: center; }
+    .hero-meta-item { font-family: var(--font-pixel); font-size: 9px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .hero-meta-item span { color: var(--text-secondary); }
+    .stats-section { padding: var(--gap-xl) 0; border-bottom: 2px solid var(--border-mid); }
+    .recent-section { padding: var(--gap-xl) 0; border-bottom: 2px solid var(--border-mid); }
+    .til-card { background: var(--bg-surface); border: 2px solid var(--border-warm); border-radius: 4px; padding: var(--gap-md); transition: all var(--transition); cursor: pointer; position: relative; text-decoration: none; display: block; }
+    .til-card::after { content: ''; position: absolute; bottom: -3px; right: -3px; width: 100%; height: 100%; background: var(--border-warm); border-radius: 4px; z-index: -1; }
+    .til-card:hover { border-color: var(--gold-dim); transform: translate(-1px, -1px); }
+    .til-card:hover::after { background: var(--gold-dim); }
+    .til-card-meta { display: flex; align-items: center; gap: var(--gap-sm); margin-bottom: var(--gap-sm); flex-wrap: wrap; }
+    .til-card-title { font-family: var(--font-pixel); font-size: 11px; color: var(--cream); margin-bottom: var(--gap-sm); line-height: 1.5; }
+    .til-card-summary { font-size: 12px; color: var(--text-muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .til-card-date { font-family: var(--font-pixel); font-size: 8px; color: var(--text-muted); margin-top: var(--gap-sm); }
+    .books-section { padding: var(--gap-xl) 0; }
+    .book-item { display: flex; align-items: center; gap: var(--gap-md); padding: var(--gap-md); background: var(--bg-surface); border: 2px solid var(--border-warm); border-radius: 4px; margin-bottom: var(--gap-md); transition: all var(--transition); position: relative; }
+    .book-item::after { content: ''; position: absolute; bottom: -3px; right: -3px; width: 100%; height: 100%; background: var(--border-warm); border-radius: 4px; z-index: -1; }
+    .book-item:hover { border-color: var(--gold-dim); transform: translate(-1px, -1px); }
+    .book-item:hover::after { background: var(--gold-dim); }
+    .book-icon { width: 40px; height: 52px; background: var(--bg-elevated); border: 1px solid var(--border-warm); border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .book-info { flex: 1; min-width: 0; }
+    .book-title { font-family: var(--font-pixel); font-size: 10px; color: var(--cream); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .book-author { font-size: 12px; color: var(--text-muted); }
+    .book-status { font-family: var(--font-pixel); font-size: 8px; padding: 3px 8px; border: 1px solid; border-radius: 2px; flex-shrink: 0; }
+    .status-reading  { color: var(--gold); border-color: var(--gold-dim); background: rgba(244,200,66,0.1); }
+    .status-done     { color: var(--green-light); border-color: var(--green-mid); background: rgba(127,176,105,0.1); }
+    .status-wishlist { color: var(--lavender); border-color: var(--lavender-dim); background: rgba(176,159,202,0.1); }
+    .notion-banner { background: linear-gradient(135deg, rgba(74,124,89,0.15) 0%, rgba(91,163,208,0.1) 100%); border: 2px solid var(--green-mid); border-radius: 4px; padding: var(--gap-lg); margin: var(--gap-xl) 0; display: flex; align-items: center; gap: var(--gap-lg); }
+    .notion-banner-icon { font-size: 32px; flex-shrink: 0; }
+    .notion-banner-text h3 { font-size: 12px; color: var(--green-light); margin-bottom: 4px; }
+    .notion-banner-text p { font-size: 13px; color: var(--text-muted); }
+    @media (max-width: 640px) { .hero-inner { flex-direction: column; gap: var(--gap-lg); } .hero-avatar { width: 60px; height: 60px; font-size: 30px; } }
+  </style>
 </head>
-<body class="grid-bg">
-
-  <!-- SVG 스프라이트 -->
-  <div style="display:none;" id="svg-sprites"></div>
-
-  <!-- 배경 캔버스 -->
-  <canvas id="bg-canvas" style="position:fixed;top:0;left:0;z-index:0;pointer-events:none;"></canvas>
-
-  <!-- 네비게이션 -->
-  <nav class="nav-pixel">
+<body>
+  <nav class="nav">
     <div class="nav-inner">
-      <a href="index.html" class="nav-logo">SRE<span>.</span>dev</a>
-      <button class="nav-menu-btn">MENU</button>
+      <a href="/" class="nav-logo">🌾 SRE</a>
       <ul class="nav-links">
-        <li><a href="index.html">HOME</a></li>
-        <li><a href="pages/til/index.html">TIL</a></li>
-        <li><a href="pages/life-os/index.html">LIFE OS</a></li>
+        <li><a href="/" class="active">HOME</a></li>
+        <li><a href="pages/til/">TIL</a></li>
+        <li><a href="pages/life-os/">BOOKS</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- 메인 콘텐츠 -->
-  <main style="position:relative;z-index:1;padding-top:70px;">
-
-    <!-- ── HERO SECTION ── -->
-    <section class="hero-section scanlines">
-      <div class="hero-inner">
-        <div class="hero-avatar-wrap">
-          <div class="hero-avatar pixel-sprite float">
-            <div class="avatar-pixel-art">
-              <!-- 픽셀아트 캐릭터 (CSS) -->
-              <div class="px-head"></div>
-              <div class="px-face">
-                <div class="px-eye left"></div>
-                <div class="px-eye right"></div>
-                <div class="px-mouth"></div>
-              </div>
-              <div class="px-body">
-                <div class="px-badge">AI</div>
-              </div>
-              <div class="px-legs">
-                <div class="px-leg left"></div>
-                <div class="px-leg right"></div>
-              </div>
-            </div>
-          </div>
-          <div class="hero-level-badge">
-            <div class="level-badge glow-pulse">
-              <span class="lv">LV.</span>
-              <span class="player-level">1</span>
+  <div class="page-wrapper">
+    <div class="container">
+      <section class="hero">
+        <div class="hero-inner">
+          <div class="hero-avatar">🌱</div>
+          <div class="hero-content">
+            <h1 class="hero-name">Self-Refining Engine</h1>
+            <p class="hero-tagline">AI 데이터 개발자의 학습 기록.<br>노션에서 쓰고, 여기서 읽는다.</p>
+            <div class="hero-meta">
+              <div class="hero-meta-item">📍 <span>AI / Data / LLM</span></div>
+              <div class="hero-meta-item">✍️ <span>TIL + 독서</span></div>
+              <div class="sync-badge"><span class="sync-dot"></span><span id="last-sync-text">동기화 중...</span></div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="hero-content">
-          <div class="hero-greeting">
-            <span class="pixel-tag tag-new blink">● ONLINE</span>
-          </div>
-          <h1 class="hero-title">
-            SELF-REFINING<br>
-            <span class="text-cyan">ENGINE</span>
-          </h1>
-          <p class="hero-subtitle">
-            AI Data Developer · Researcher · Builder<br>
-            <span class="text-gold">끊임없이 자기 자신을 개선하는 엔진</span>
-          </p>
+      <section class="stats-section">
+        <div class="grid-stats">
+          <div class="stat-card"><span class="stat-number" id="stat-til">0</span><span class="stat-label">TIL 작성</span></div>
+          <div class="stat-card"><span class="stat-number" id="stat-books">0</span><span class="stat-label">완독</span></div>
+          <div class="stat-card"><span class="stat-number" id="stat-reading">0</span><span class="stat-label">읽는 중</span></div>
+          <div class="stat-card"><span class="stat-number" id="stat-tags">0</span><span class="stat-label">태그</span></div>
+        </div>
+      </section>
 
-          <!-- XP Bar -->
-          <div class="xp-container" style="margin-top:16px;max-width:400px;">
-            <span class="xp-label">XP</span>
-            <div class="xp-bar">
-              <div class="xp-fill" style="width:0%"></div>
-            </div>
-            <span class="xp-current">0</span><span style="font-size:8px;color:var(--text-muted)">/100</span>
-          </div>
+      <section class="recent-section">
+        <div class="section-header">
+          <h2 class="section-title">최근 TIL</h2>
+          <a href="pages/til/" class="btn btn-ghost btn-sm">전체 보기 →</a>
+        </div>
+        <div id="recent-til-list" class="grid-2"></div>
+      </section>
 
-          <div class="hero-actions">
-            <a href="pages/til/index.html" class="btn-pixel btn-cyan">▶ TIL 보기</a>
-            <a href="pages/life-os/index.html" class="btn-pixel">◆ LIFE OS</a>
-          </div>
+      <section class="books-section">
+        <div class="section-header">
+          <h2 class="section-title">독서 기록</h2>
+          <a href="pages/life-os/" class="btn btn-ghost btn-sm">전체 보기 →</a>
+        </div>
+        <div id="recent-books-list"></div>
+      </section>
+
+      <div class="notion-banner" id="notion-guide" style="display:none;">
+        <div class="notion-banner-icon">📝</div>
+        <div class="notion-banner-text">
+          <h3>노션에서 바로 작성하세요</h3>
+          <p>노션 TIL/Books 데이터베이스에 글을 쓰고 Published를 체크하면 자동으로 여기에 반영됩니다.</p>
         </div>
       </div>
+    </div>
 
-      <!-- 스크롤 힌트 -->
-      <div class="scroll-hint">
-        <span class="font-pixel" style="font-size:8px;color:var(--text-muted)">SCROLL DOWN</span>
-        <div class="scroll-arrow blink">▼</div>
+    <footer class="footer">
+      <div class="container">
+        <p class="footer-text">🌾 Self-Refining Engine · Powered by Notion + GitHub Pages</p>
+        <ul class="footer-links">
+          <li><a href="pages/til/">TIL</a></li>
+          <li><a href="pages/life-os/">Books</a></li>
+          <li><a href="https://github.com/hyunNus/hyunNus.github.io" target="_blank">GitHub</a></li>
+        </ul>
       </div>
-    </section>
+    </footer>
+  </div>
 
-    <!-- ── STATS DASHBOARD ── -->
-    <section class="section reveal">
-      <div class="section-header">
-        <span class="section-icon text-gold">◈</span>
-        <h2>PLAYER STATS</h2>
-        <div class="pixel-divider" style="flex:1;margin:0;"></div>
-      </div>
+  <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
-      <div class="stats-grid">
-        <div class="stat-box pixel-corner reveal">
-          <span class="stat-number text-cyan" data-count="0" id="stat-til">0</span>
-          <span class="stat-label">TIL 작성</span>
-        </div>
-        <div class="stat-box pixel-corner reveal">
-          <span class="stat-number text-pink" data-count="0" id="stat-books">0</span>
-          <span class="stat-label">독서 완료</span>
-        </div>
-        <div class="stat-box pixel-corner reveal">
-          <span class="stat-number text-gold" data-count="0" id="stat-xp">0</span>
-          <span class="stat-label">총 XP</span>
-        </div>
-        <div class="stat-box pixel-corner reveal">
-          <span class="stat-number text-green" data-count="0" id="stat-streak">0</span>
-          <span class="stat-label">연속 방문</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── RECENT TIL ── -->
-    <section class="section reveal">
-      <div class="section-header">
-        <span class="section-icon text-cyan">◉</span>
-        <h2>RECENT TIL</h2>
-        <div class="pixel-divider" style="flex:1;margin:0;"></div>
-        <a href="pages/til/index.html" class="btn-pixel btn-cyan" style="font-size:8px;padding:6px 12px;">ALL →</a>
-      </div>
-
-      <div id="recent-til-grid" class="til-preview-grid">
-        <!-- JS로 렌더링 -->
-      </div>
-    </section>
-
-    <!-- ── SKILL TREE ── -->
-    <section class="section reveal">
-      <div class="section-header">
-        <span class="section-icon text-purple">◇</span>
-        <h2>SKILL TREE</h2>
-        <div class="pixel-divider" style="flex:1;margin:0;"></div>
-      </div>
-
-      <div class="skill-tree-grid">
-        <div class="skill-category pixel-card reveal">
-          <div class="skill-cat-header">
-            <span class="text-cyan font-pixel" style="font-size:10px;">◉ ML/DL</span>
-          </div>
-          <div class="skill-list">
-            <div class="skill-item">
-              <span class="skill-name">PyTorch</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill cyan" style="width:85%"></div></div>
-              <span class="skill-pct text-cyan">85</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">Transformers</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill cyan" style="width:78%"></div></div>
-              <span class="skill-pct text-cyan">78</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">Scikit-learn</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill cyan" style="width:90%"></div></div>
-              <span class="skill-pct text-cyan">90</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="skill-category pixel-card reveal">
-          <div class="skill-cat-header">
-            <span class="text-gold font-pixel" style="font-size:10px;">◈ LLM/RAG</span>
-          </div>
-          <div class="skill-list">
-            <div class="skill-item">
-              <span class="skill-name">LangChain</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill gold" style="width:72%"></div></div>
-              <span class="skill-pct text-gold">72</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">RAG Pipeline</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill gold" style="width:68%"></div></div>
-              <span class="skill-pct text-gold">68</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">Fine-tuning</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill gold" style="width:60%"></div></div>
-              <span class="skill-pct text-gold">60</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="skill-category pixel-card reveal">
-          <div class="skill-cat-header">
-            <span class="text-green font-pixel" style="font-size:10px;">◆ BACKEND</span>
-          </div>
-          <div class="skill-list">
-            <div class="skill-item">
-              <span class="skill-name">Python</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill" style="width:92%"></div></div>
-              <span class="skill-pct text-green">92</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">FastAPI</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill" style="width:80%"></div></div>
-              <span class="skill-pct text-green">80</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">Docker</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill" style="width:75%"></div></div>
-              <span class="skill-pct text-green">75</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="skill-category pixel-card reveal">
-          <div class="skill-cat-header">
-            <span class="text-pink font-pixel" style="font-size:10px;">◎ DATA</span>
-          </div>
-          <div class="skill-list">
-            <div class="skill-item">
-              <span class="skill-name">Pandas/NumPy</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill pink" style="width:88%"></div></div>
-              <span class="skill-pct text-pink">88</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">SQL</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill pink" style="width:82%"></div></div>
-              <span class="skill-pct text-pink">82</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-name">Spark</span>
-              <div class="pixel-progress"><div class="pixel-progress-fill pink" style="width:55%"></div></div>
-              <span class="skill-pct text-pink">55</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── ACTIVITY HEATMAP ── -->
-    <section class="section reveal">
-      <div class="section-header">
-        <span class="section-icon text-green">◉</span>
-        <h2>ACTIVITY LOG</h2>
-        <div class="pixel-divider" style="flex:1;margin:0;"></div>
-      </div>
-      <div class="activity-container pixel-card">
-        <div class="activity-header">
-          <span class="font-pixel text-muted" style="font-size:8px;">CONTRIBUTION HEATMAP</span>
-          <span class="font-pixel text-gold" style="font-size:8px;" id="activity-total">0 ACTIVITIES</span>
-        </div>
-        <div id="heatmap-grid" class="heatmap-grid"></div>
-        <div class="heatmap-legend">
-          <span class="font-pixel text-muted" style="font-size:7px;">LESS</span>
-          <div class="legend-box" style="background:#1e2a4a;"></div>
-          <div class="legend-box" style="background:#1a4a2e;"></div>
-          <div class="legend-box" style="background:#1a6a3e;"></div>
-          <div class="legend-box" style="background:#39ff14;opacity:0.6;"></div>
-          <div class="legend-box" style="background:#39ff14;"></div>
-          <span class="font-pixel text-muted" style="font-size:7px;">MORE</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── CURRENT FOCUS ── -->
-    <section class="section reveal">
-      <div class="section-header">
-        <span class="section-icon text-orange">◈</span>
-        <h2>CURRENT QUEST</h2>
-        <div class="pixel-divider" style="flex:1;margin:0;"></div>
-      </div>
-
-      <div class="quest-grid">
-        <div class="quest-card pixel-card pixel-corner">
-          <div class="quest-header">
-            <span class="pixel-tag tag-dev">MAIN QUEST</span>
-            <span class="font-pixel text-muted" style="font-size:7px;">진행중</span>
-          </div>
-          <h3 style="margin:12px 0 8px;color:var(--accent-cyan);">RAG 시스템 고도화</h3>
-          <p>Hybrid Search + Re-ranking 파이프라인 구축 및 성능 벤치마킹</p>
-          <div class="pixel-progress" style="margin-top:12px;">
-            <div class="pixel-progress-fill cyan" style="width:65%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;">
-            <span class="font-pixel text-muted" style="font-size:7px;">65% COMPLETE</span>
-            <span class="font-pixel text-cyan" style="font-size:7px;">+100 XP</span>
-          </div>
-        </div>
-
-        <div class="quest-card pixel-card pixel-corner">
-          <div class="quest-header">
-            <span class="pixel-tag tag-paper">SIDE QUEST</span>
-            <span class="font-pixel text-muted" style="font-size:7px;">진행중</span>
-          </div>
-          <h3 style="margin:12px 0 8px;color:var(--accent-purple);">논문 리뷰 시리즈</h3>
-          <p>Attention Is All You Need → BERT → GPT 계보 정리</p>
-          <div class="pixel-progress" style="margin-top:12px;">
-            <div class="pixel-progress-fill" style="width:40%;background:repeating-linear-gradient(90deg,var(--accent-purple) 0,var(--accent-purple) 8px,transparent 8px,transparent 10px);"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;">
-            <span class="font-pixel text-muted" style="font-size:7px;">40% COMPLETE</span>
-            <span class="font-pixel text-purple" style="font-size:7px;">+80 XP</span>
-          </div>
-        </div>
-
-        <div class="quest-card pixel-card pixel-corner">
-          <div class="quest-header">
-            <span class="pixel-tag tag-book">READING QUEST</span>
-            <span class="font-pixel text-muted" style="font-size:7px;">진행중</span>
-          </div>
-          <h3 style="margin:12px 0 8px;color:var(--accent-pink);">밑바닥부터 딥러닝 3</h3>
-          <p>프레임워크 내부 구현 이해를 통한 딥러닝 기초 강화</p>
-          <div class="pixel-progress" style="margin-top:12px;">
-            <div class="pixel-progress-fill pink" style="width:58%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:4px;">
-            <span class="font-pixel text-muted" style="font-size:7px;">58% COMPLETE</span>
-            <span class="font-pixel text-pink" style="font-size:7px;">+50 XP</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- 푸터 -->
-  <footer class="footer-pixel">
-    <p>SELF-REFINING ENGINE © 2025 · Built with <span class="text-gold">♥</span> &amp; Pixel Art</p>
-    <p style="margin-top:8px;">
-      <a href="https://github.com/hyunNus" target="_blank">GITHUB</a>
-      <span class="text-muted"> · </span>
-      <a href="pages/til/index.html">TIL</a>
-      <span class="text-muted"> · </span>
-      <a href="pages/life-os/index.html">LIFE OS</a>
-    </p>
-  </footer>
-
-  <!-- 스크롤 탑 -->
-  <button class="scroll-top" title="맨 위로">▲</button>
-
-  <!-- 토스트 -->
-  <div class="pixel-toast"></div>
-
-  <script src="assets/js/pixel-core.js"></script>
-  <script src="assets/js/pixel-effects.js"></script>
-  <script src="assets/js/home.js"></script>
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('scroll-top').classList.toggle('visible', window.scrollY > 300);
+    });
+    const CATEGORY_BADGE = { 'DEV': 'badge-dev', 'PAPER': 'badge-paper', 'STACK': 'badge-stack' };
+    const BOOK_STATUS_CLASS = { '읽는 중': 'status-reading', '완독': 'status-done', '위시리스트': 'status-wishlist' };
+    const GENRE_ICON = { 'TECH': '💻', 'DEV': '⚙️', 'GROWTH': '🌱', 'GENERAL': '📖' };
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+    }
+    function renderEmpty(container, icon, title, desc, linkHref, linkText) {
+      container.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">' + icon + '</span><p class="empty-title">' + title + '</p><p class="empty-desc">' + desc + '</p><a href="' + linkHref + '" class="btn btn-primary">' + linkText + '</a></div>';
+    }
+    function renderTILCard(item) {
+      const badgeClass = CATEGORY_BADGE[item.category] || 'badge-dev';
+      const tags = (item.tags || []).slice(0,3).map(t => '<span class="tag">' + t + '</span>').join('');
+      return '<a class="til-card" href="pages/til/?id=' + item.id + '"><div class="til-card-meta"><span class="badge ' + badgeClass + '">' + (item.category || 'DEV') + '</span>' + tags + '</div><div class="til-card-title">' + item.title + '</div>' + (item.summary ? '<p class="til-card-summary">' + item.summary + '</p>' : '') + '<div class="til-card-date">' + formatDate(item.date || item.created) + '</div></a>';
+    }
+    function renderBookItem(item) {
+      const statusClass = BOOK_STATUS_CLASS[item.status] || 'status-wishlist';
+      const icon = GENRE_ICON[item.genre] || '📖';
+      const stars = item.rating ? Array.from({length:5},(_,i) => '<span class="star' + (i < item.rating ? ' filled' : '') + '">★</span>').join('') : '';
+      return '<div class="book-item"><div class="book-icon">' + icon + '</div><div class="book-info"><div class="book-title">' + item.title + '</div><div class="book-author">' + (item.author || '') + '</div>' + (stars ? '<div class="stars mt-sm">' + stars + '</div>' : '') + '</div><span class="book-status ' + statusClass + '">' + (item.status || '위시리스트') + '</span></div>';
+    }
+    async function loadData() {
+      try {
+        const [tilRes, booksRes, metaRes] = await Promise.all([
+          fetch('data/til.json').then(r => r.json()).catch(() => ({count:0,items:[]})),
+          fetch('data/books.json').then(r => r.json()).catch(() => ({count:0,items:[]})),
+          fetch('data/meta.json').then(r => r.json()).catch(() => ({})),
+        ]);
+        if (metaRes.lastSync) document.getElementById('last-sync-text').textContent = formatDate(metaRes.lastSync) + ' 동기화';
+        const tilItems = tilRes.items || [];
+        const bookItems = booksRes.items || [];
+        const doneBooks = bookItems.filter(b => b.status === '완독');
+        const readingBooks = bookItems.filter(b => b.status === '읽는 중');
+        const allTags = [...new Set(tilItems.flatMap(t => t.tags || []))];
+        document.getElementById('stat-til').textContent = tilItems.length;
+        document.getElementById('stat-books').textContent = doneBooks.length;
+        document.getElementById('stat-reading').textContent = readingBooks.length;
+        document.getElementById('stat-tags').textContent = allTags.length;
+        const tilContainer = document.getElementById('recent-til-list');
+        const recentTIL = tilItems.slice(0, 4);
+        if (recentTIL.length === 0) {
+          renderEmpty(tilContainer, '🌱', '아직 TIL이 없어요', '노션 TIL 데이터베이스에 첫 글을 작성해보세요.', 'pages/til/', 'TIL 보러가기');
+          document.getElementById('notion-guide').style.display = 'flex';
+        } else {
+          tilContainer.innerHTML = recentTIL.map(renderTILCard).join('');
+        }
+        const booksContainer = document.getElementById('recent-books-list');
+        const sortedBooks = [...bookItems.filter(b => b.status === '읽는 중'), ...bookItems.filter(b => b.status === '완독'), ...bookItems.filter(b => b.status === '위시리스트')].slice(0, 5);
+        if (sortedBooks.length === 0) {
+          booksContainer.innerHTML = '<div class="empty-state"><span class="empty-icon">📚</span><p class="empty-title">아직 독서 기록이 없어요</p><p class="empty-desc">노션 Books 데이터베이스에 읽고 있는 책을 추가해보세요.</p><a href="pages/life-os/" class="btn btn-primary">독서 기록 보러가기</a></div>';
+          document.getElementById('notion-guide').style.display = 'flex';
+        } else {
+          booksContainer.innerHTML = sortedBooks.map(renderBookItem).join('');
+        }
+      } catch(err) {
+        document.getElementById('last-sync-text').textContent = '연결 필요';
+        document.getElementById('notion-guide').style.display = 'flex';
+      }
+    }
+    loadData();
+  </script>
 </body>
 </html>

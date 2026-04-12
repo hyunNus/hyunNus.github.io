@@ -3,49 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 | Self-Refining Engine</title>
+  <title>404 — SRE</title>
   <link rel="stylesheet" href="/assets/css/pixel-system.css">
   <style>
-    .error-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: var(--gap-lg);
-    }
-    .error-code {
-      font-family: var(--font-pixel);
-      font-size: clamp(40px, 10vw, 80px);
-      color: var(--accent-gold);
-      text-shadow: 4px 4px 0 rgba(255,215,0,0.2);
-      line-height: 1;
-      margin-bottom: var(--gap-md);
-    }
-    .error-msg {
-      font-family: var(--font-pixel);
-      font-size: clamp(10px, 2vw, 14px);
-      color: var(--accent-cyan);
-      margin-bottom: var(--gap-lg);
-    }
-    .error-pixel-art {
-      font-size: 60px;
-      margin-bottom: var(--gap-lg);
-      animation: pixel-float 2s ease-in-out infinite;
-    }
+    .error-page { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
+    .error-inner { text-align: center; padding: var(--gap-2xl) var(--gap-lg); }
+    .error-icon { font-size: 72px; display: block; margin-bottom: var(--gap-xl); }
+    .error-code { font-family: var(--font-pixel); font-size: clamp(48px, 10vw, 80px); color: var(--gold); display: block; margin-bottom: var(--gap-md); }
+    .error-msg { font-family: var(--font-pixel); font-size: 13px; color: var(--text-secondary); margin-bottom: var(--gap-sm); }
+    .error-desc { font-size: 14px; color: var(--text-muted); margin-bottom: var(--gap-xl); }
   </style>
 </head>
-<body class="grid-bg">
-  <div class="error-page">
-    <div class="error-pixel-art">👾</div>
-    <div class="error-code">404</div>
-    <div class="error-msg">PAGE NOT FOUND</div>
-    <p style="font-size:20px;color:var(--text-muted);margin-bottom:var(--gap-lg);">
-      이 페이지는 존재하지 않거나 이동되었습니다.
-    </p>
-    <a href="/" class="btn-pixel btn-cyan">◀ HOME으로 돌아가기</a>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">🌾 SRE</a>
+      <ul class="nav-links">
+        <li><a href="/">HOME</a></li>
+        <li><a href="/pages/til/">TIL</a></li>
+        <li><a href="/pages/life-os/">BOOKS</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="page-wrapper">
+    <div class="error-page">
+      <div class="error-inner">
+        <span class="error-icon">🌾</span>
+        <span class="error-code">404</span>
+        <p class="error-msg">페이지를 찾을 수 없어요</p>
+        <p class="error-desc">길을 잃었나요? 아직 심어지지 않은 씨앗 같은 페이지입니다.</p>
+        <a href="/" class="btn btn-primary">홈으로 돌아가기</a>
+      </div>
+    </div>
   </div>
-  <script src="/assets/js/pixel-core.js"></script>
 </body>
 </html>
