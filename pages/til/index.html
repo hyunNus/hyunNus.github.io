@@ -217,11 +217,29 @@
     }
     .til-card:hover {
       border-color: var(--pub-border2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(255,107,26,0.12), 0 2px 8px rgba(0,0,0,0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(255,107,26,0.18), 0 2px 8px rgba(0,0,0,0.5);
     }
     .til-card:hover::before { opacity: 1; }
     .til-card:hover::after  { opacity: 1; }
+    /* 모바일 터치 피드백 */
+    .til-card:active {
+      transform: translateY(-1px) scale(0.99);
+      box-shadow: 0 4px 16px rgba(255,107,26,0.2);
+    }
+    /* 카드 등장 애니메이션 */
+    .til-card {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .til-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .til-card.visible:hover {
+      transform: translateY(-3px);
+    }
 
     .til-card-cat {
       font-family: var(--font-pixel); font-size: 7px;
@@ -480,7 +498,7 @@
 
   <script>
   // ══════════════════════════════════════════════════════════
-  //  모닥불 Canvas 애니메이션
+  //  모닥불 Canvas 애니메이션 (스크롤 연동 강화)
   // ══════════════════════════════════════════════════════════
   (function() {
     const canvas = document.getElementById('fire-canvas');
@@ -488,6 +506,16 @@
     const W = canvas.width, H = canvas.height;
     const SCALE = 2;
     const GW = Math.ceil(W/SCALE), GH = Math.ceil(H/SCALE);
+
+    // 스크롤 강도 추적 (스크롤할수록 불꽃이 커짐)
+    let scrollIntensity = 1.0;
+    let lastScrollY = 0;
+    let scrollVelocity = 0;
+    window.addEventListener('scroll', () => {
+      const dy = Math.abs(window.scrollY - lastScrollY);
+      scrollVelocity = Math.min(dy * 0.08, 2.5);
+      lastScrollY = window.scrollY;
+    }, { passive: true });
 
     function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x*SCALE,y*SCALE,w*SCALE,h*SCALE); }
 
@@ -541,27 +569,39 @@
     }
 
     let lastT = 0;
+    let canvasVisible = true;
+    const obs = new IntersectionObserver(e => { canvasVisible = e[0].isIntersecting; }, {threshold:0.01});
+    obs.observe(canvas);
+    document.addEventListener('visibilitychange', () => { if(document.hidden) lastT = 0; });
+
     function draw(t) {
-      const dt = Math.min((t - lastT) / 16.67, 3);
+      if(!canvasVisible || document.hidden) { requestAnimationFrame(draw); return; }
+      const dt = lastT ? Math.min((t - lastT) / 16.67, 3) : 1;
       lastT = t;
+
+      // 스크롤 강도 감쇠
+      scrollIntensity = 1.0 + scrollVelocity;
+      scrollVelocity *= 0.88;
+
       ctx.clearRect(0, 0, W, H);
 
-      // 바닥 글로우
-      const grd = ctx.createRadialGradient(W/2, H-10, 0, W/2, H-10, 60);
-      grd.addColorStop(0, 'rgba(255,107,26,0.35)');
+      // 바닥 글로우 (스크롤 강도에 따라 확장)
+      const glowR = 60 + scrollVelocity * 20;
+      const grd = ctx.createRadialGradient(W/2, H-10, 0, W/2, H-10, glowR);
+      grd.addColorStop(0, `rgba(255,107,26,${0.35 + scrollVelocity * 0.1})`);
       grd.addColorStop(0.5, 'rgba(200,75,0,0.12)');
       grd.addColorStop(1, 'transparent');
       ctx.fillStyle = grd;
       ctx.fillRect(0, 0, W, H);
 
-      // 불꽃
+      // 불꽃 (스크롤 강도에 따라 더 크고 빠르게)
       flames.forEach(f => {
-        f.x += f.vx * dt;
-        f.y += f.vy * dt;
+        f.x += f.vx * dt * scrollIntensity;
+        f.y += f.vy * dt * scrollIntensity;
         f.life -= dt / (f.maxLife * 60);
         if(f.life <= 0) Object.assign(f, newFlame());
         const alpha = Math.max(0, f.life) * 0.9;
-        const sz = f.sz * f.life * SCALE;
+        const sz = f.sz * f.life * SCALE * scrollIntensity;
         if(sz < 1) return;
         const gf = ctx.createRadialGradient(f.x*SCALE, f.y*SCALE, 0, f.x*SCALE, f.y*SCALE, sz);
         gf.addColorStop(0, fireColor(f.hue+20, alpha));
@@ -573,10 +613,10 @@
         ctx.fill();
       });
 
-      // 불씨
+      // 불씨 (스크롤 시 더 많이 튀어오름)
       embers.forEach(e => {
-        e.x += e.vx * dt;
-        e.y += e.vy * dt;
+        e.x += e.vx * dt * (1 + scrollVelocity * 0.3);
+        e.y += e.vy * dt * scrollIntensity;
         e.vy += 0.04 * dt;
         e.life -= dt * 0.015;
         if(e.life <= 0) Object.assign(e, newEmber());
@@ -594,6 +634,28 @@
     }
     requestAnimationFrame(draw);
   })();
+
+  // ══════════════════════════════════════════════════════════
+  //  카드 등장 IntersectionObserver
+  // ══════════════════════════════════════════════════════════
+  function observeCards() {
+    const cardObs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if(entry.isIntersecting) {
+          // 순서대로 딜레이를 주어 cascade 효과
+          const idx = Array.from(document.querySelectorAll('.til-card')).indexOf(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, (idx % 6) * 60);
+          cardObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.til-card').forEach(card => {
+      cardObs.observe(card);
+    });
+  }
 
   // ══════════════════════════════════════════════════════════
   //  데이터 로드 및 렌더
@@ -624,7 +686,6 @@
 
     const cnt = document.getElementById('result-count');
     if(cnt) cnt.innerHTML = `<span>${items.length}</span> post${items.length!==1?'s':''} found`;
-
     const container = document.getElementById('til-container');
     if(!items.length) {
       container.innerHTML = `<div class="empty-state">
@@ -636,7 +697,7 @@
 
     const CE = {DEV:'// DEV', PAPER:'§ PAPER', STACK:'⚙ STACK'};
     container.innerHTML = `<div class="til-grid">${items.map(t=>`
-      <div class="til-card" onclick="openModal('${esc(t.id)}')">
+      <div class="til-card" onclick="openModal('${esc(t.id)}'); spawnFireClick(event)">
         <div class="til-card-cat"><span class="cat-dot"></span>${CE[t.category]||t.category||'TIL'}</div>
         <div class="til-card-title">${esc(t.title)}</div>
         <div class="til-card-summary">${esc(t.summary||'')}</div>
@@ -645,6 +706,8 @@
           <div class="til-tags">${(t.tags||[]).slice(0,3).map(tg=>`<span class="til-tag">${esc(tg)}</span>`).join('')}</div>
         </div>
       </div>`).join('')}</div>`;
+    // 카드 렌더 후 등장 애니메이션 적용
+    requestAnimationFrame(() => observeCards());
   }
 
   // ── 필터 이벤트 ─────────────────────────────────────────
@@ -710,11 +773,50 @@
       .replace(/<p><\/p>/g, '');
   }
 
+  // ── 카드 클릭 시 불꽃 파티클 이펙트 ────────────────────
+  function spawnFireClick(e) {
+    const x = e.clientX, y = e.clientY;
+    const count = 12;
+    for(let i = 0; i < count; i++) {
+      const spark = document.createElement('div');
+      const angle = (i / count) * Math.PI * 2;
+      const dist = 30 + Math.random() * 40;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist - 20;
+      spark.style.cssText = `
+        position:fixed; left:${x}px; top:${y}px;
+        width:${4 + Math.random()*4}px; height:${4 + Math.random()*4}px;
+        border-radius:50%;
+        background:${Math.random()>0.5?'#FF6B1A':'#FFD700'};
+        box-shadow:0 0 6px #FF6B1A;
+        pointer-events:none; z-index:9999;
+        transform:translate(-50%,-50%);
+        animation:sparkFly 0.6s ease-out forwards;
+        --dx:${dx}px; --dy:${dy}px;
+      `;
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 650);
+    }
+  }
+
+  // sparkFly 키프레임 동적 추가
+  if(!document.getElementById('spark-style')) {
+    const s = document.createElement('style');
+    s.id = 'spark-style';
+    s.textContent = `
+      @keyframes sparkFly {
+        0%   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+        100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   window.addEventListener('scroll',()=>{
     document.getElementById('scroll-top')?.classList.toggle('visible',window.scrollY>300);
-  });
+  }, { passive: true });
 
   loadData();
   </script>

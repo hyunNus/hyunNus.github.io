@@ -692,7 +692,8 @@
     }));
   }
 
-  function drawParticles(ctx, canvasW, canvasH) {
+  function drawParticles(ctx, canvasW, canvasH, dt=16.67) {
+    const speed = dt / 16.67;
     particles.forEach(p => {
       ctx.save();
       ctx.globalAlpha = p.op;
@@ -723,9 +724,9 @@
         ctx.fill();
       }
       ctx.restore();
-      p.x  += p.vx;
-      p.y  += p.vy;
-      p.rot += p.vrot;
+      p.x  += p.vx * speed;
+      p.y  += p.vy * speed;
+      p.rot += p.vrot * speed;
       if(p.y > canvasH*0.55) { p.y = -10; p.x = Math.random()*canvasW; }
       if(p.x > canvasW+10)   p.x = -10;
       if(p.x < -10)          p.x = canvasW+10;
@@ -733,6 +734,8 @@
   }
 
   // ── 구름 상태 ─────────────────────────────────────────────
+  // iOS Safari: 스크롤 중 rAF가 계속 실행되어 구름이 빠르게 움직이는 버그 방지
+  // → 실제 경과 시간(dt)을 기반으로 속도 계산, 최대 dt 클램프
   let clouds = [];
   function initClouds(canvasW) {
     const n = season==='winter'?5:4;
@@ -860,8 +863,25 @@
 
     const ctx = canvas.getContext('2d');
 
+    // Canvas가 뷰포트 밖으로 나가면 애니메이션 일시정지
+    let canvasVisible = true;
+    const observer = new IntersectionObserver(entries => {
+      canvasVisible = entries[0].isIntersecting;
+    }, { threshold: 0.01 });
+    observer.observe(canvas);
+
+    // 페이지 숨김 시 일시정지
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) lastTime = 0;
+    });
+
     function render(time) {
-      const dt = time - lastTime;
+      if(!canvasVisible || document.hidden) {
+        animFrame = requestAnimationFrame(render);
+        return;
+      }
+      // dt 클램프: 탭 전환/스크롤 복귀 시 dt가 수초가 되는 현상 방지 (최대 50ms)
+      const dt = lastTime ? Math.min(time - lastTime, 50) : 16;
       lastTime = time;
 
       ctx.clearRect(0, 0, CW, CH);
@@ -880,15 +900,15 @@
       ctx.fillStyle = gndGrad;
       ctx.fillRect(0, gndY*SCALE, CW, gndH*SCALE);
 
-      // ── 구름 ──────────────────────────────────────────────
+      // ── 구름 (dt 기반 이동 → iOS 스크롤 버그 수정) ──────────
       clouds.forEach(c => {
         drawCloud(ctx, c.x/SCALE, c.y, c.w);
-        c.x += c.speed;
+        c.x += c.speed * (dt / 16.67); // 60fps 기준 정규화
         if(c.x > CW + c.w*SCALE) c.x = -c.w*SCALE;
       });
 
-      // ── 파티클 ────────────────────────────────────────────
-      drawParticles(ctx, CW, CH);
+      // ── 파티클 (dt 기반) ──────────────────────────────────
+      drawParticles(ctx, CW, CH, dt);
 
       // ── 밭 ────────────────────────────────────────────────
       for(let i=0; i<plantCount; i++) {
@@ -905,7 +925,8 @@
       // ── 울타리 ────────────────────────────────────────────
       drawFence(ctx, CW, fenceY);
 
-      // ── 농부 이동 ─────────────────────────────────────────
+      // ── 농부 이동 (dt 기반) ───────────────────────────────
+      const spd = dt / 16.67;
       farmerMoveTimer += dt;
       if(farmerMoveTimer > 3500) {
         farmerMoveTimer = 0;
@@ -916,7 +937,7 @@
       }
       const dx = farmerTargetX - farmerX;
       if(Math.abs(dx) > 0.5) {
-        farmerX += dx * 0.025;
+        farmerX += dx * 0.025 * spd;
         farmerFrameTimer += dt;
         if(farmerFrameTimer > 300) { farmerFrame = 1-farmerFrame; farmerFrameTimer=0; }
       } else {

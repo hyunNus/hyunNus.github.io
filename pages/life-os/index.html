@@ -219,10 +219,17 @@
       border-radius: var(--radius);
       padding: 20px;
       cursor: pointer;
-      transition: all var(--transition);
       position: relative;
       overflow: hidden;
       display: flex; gap: 16px;
+      /* 등장 애니메이션 초기 상태 */
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .book-card.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
     /* 책등 색상 줄 */
     .book-card::before {
@@ -236,8 +243,18 @@
 
     .book-card:hover {
       border-color: var(--lib-border2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(200,150,10,0.08), 0 2px 8px rgba(0,0,0,0.4);
+      transform: translateY(-3px) !important;
+      box-shadow: 0 12px 40px rgba(200,150,10,0.14), 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .book-card:active {
+      transform: translateY(-1px) scale(0.99) !important;
+    }
+    /* 책 표지 — 호버 시 살짝 위로 꺼내지는 효과 */
+    .book-cover {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .book-card:hover .book-cover {
+      transform: translateY(-6px) rotate(-2deg);
     }
 
     /* 책 표지 (픽셀 아이콘) */
@@ -247,6 +264,7 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 26px;
       position: relative;
+      box-shadow: 3px 3px 8px rgba(0,0,0,0.5), inset -2px 0 4px rgba(0,0,0,0.3);
     }
     .book-cover[data-genre="TECH"]    { background: linear-gradient(160deg, #1A3A6B, #0D2040); border: 1px solid #2A5A9B; }
     .book-cover[data-genre="DEV"]     { background: linear-gradient(160deg, #1A4A1A, #0D2A0D); border: 1px solid #2A7A2A; }
@@ -302,12 +320,18 @@
     /* ── 상세 모달 ─────────────────────────────────────── */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,0.88);
-      backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0);
+      backdrop-filter: blur(0px);
       display: none; align-items: center; justify-content: center;
       padding: 20px;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
     }
-    .modal-overlay.open { display: flex; }
+    .modal-overlay.open {
+      display: flex;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
+    }
+    /* 모달 열릴 때 책 펼치기 애니메이션 */
     .modal {
       background: var(--lib-card);
       border: 1px solid var(--lib-border2);
@@ -316,6 +340,13 @@
       max-height: 85vh; overflow-y: auto;
       box-shadow: 0 0 60px rgba(200,150,10,0.12), 0 20px 60px rgba(0,0,0,0.7);
       position: relative;
+      transform: scale(0.88) translateY(20px);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1), opacity 0.3s ease;
+    }
+    .modal-overlay.open .modal {
+      transform: scale(1) translateY(0);
+      opacity: 1;
     }
     .modal-header {
       padding: 28px 28px 20px;
@@ -669,12 +700,19 @@
       ctx.fillRect(0, 0, W, H);
     }
 
+    let canvasVisible = true;
+    const canvasObs = new IntersectionObserver(e => { canvasVisible = e[0].isIntersecting; }, {threshold:0.01});
+    canvasObs.observe(canvas);
+    document.addEventListener('visibilitychange', () => { if(document.hidden) canvasVisible = false; else canvasVisible = true; });
+
     function render() {
-      drawShelf();
-      drawBooks();
-      drawBookmarks();
-      drawDust();
-      drawLamp();
+      if(canvasVisible) {
+        drawShelf();
+        drawBooks();
+        drawBookmarks();
+        drawDust();
+        drawLamp();
+      }
       requestAnimationFrame(render);
     }
     requestAnimationFrame(render);
@@ -735,7 +773,9 @@
     const SL = {'완독':'FINISHED', '읽는 중':'READING', '위시리스트':'WISHLIST'};
 
     container.innerHTML = `<div class="books-grid">${items.map(b=>`
-      <div class="book-card" data-genre="${esc(b.genre||'GENERAL')}" onclick="openModal('${esc(b.id)}')">
+      <div class="book-card" data-genre="${esc(b.genre||'GENERAL')}" onclick="openModal('${esc(b.id)}')"
+           onmouseenter="this.querySelector('.book-cover').style.transform='translateY(-6px) rotate(-2deg)'"
+           onmouseleave="this.querySelector('.book-cover').style.transform=''">
         <div class="book-cover" data-genre="${esc(b.genre||'GENERAL')}">${GI[b.genre]||'📖'}</div>
         <div class="book-info">
           <div class="book-genre" data-genre="${esc(b.genre||'GENERAL')}">${GE[b.genre]||b.genre||'GENERAL'}</div>
@@ -747,6 +787,7 @@
           </div>
         </div>
       </div>`).join('')}</div>`;
+    requestAnimationFrame(() => observeCards());
   }
 
   function renderStars(rating) {
@@ -756,9 +797,22 @@
     ).join('');
   }
 
-  // ── 필터 이벤트 ─────────────────────────────────────────
-  document.querySelectorAll('[data-status]').forEach(btn => {
-    btn.addEventListener('click', () => {
+  // ── 카드 등장 IntersectionObserver ─────────────────────────────
+  function observeCards() {
+    const cardObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          const idx = Array.from(document.querySelectorAll('.book-card')).indexOf(entry.target);
+          setTimeout(() => entry.target.classList.add('visible'), (idx % 5) * 70);
+          cardObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.book-card').forEach(c => cardObs.observe(c));
+  }
+
+  // ── 필터 이벤트 ───────────────────────────────────────────────────────
+  document.querySelectorAll('[data-status]').forEach(btn => {   btn.addEventListener('click', () => {
       document.querySelectorAll('[data-status]').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       currentStatus = btn.dataset.status;
@@ -779,6 +833,9 @@
   // ── 모달 ────────────────────────────────────────────────
   function openModal(id) {
     const b = ALL_ITEMS.find(x=>x.id===id); if(!b) return;
+    // 모달 열기 전 리셋 (display:flex로 설정 후 다음 프레임에 open 클래스 추가)
+    const overlay = document.getElementById('modal-overlay');
+    overlay.style.display = 'flex';
     const GE = {TECH:'🔬 TECH', DEV:'💻 DEV', GROWTH:'🌱 GROWTH', GENERAL:'📖 GENERAL'};
     const SC = {'완독':'done','읽는 중':'reading','위시리스트':'wish'};
     const SL = {'완독':'FINISHED','읽는 중':'READING','위시리스트':'WISHLIST'};
@@ -802,13 +859,18 @@
     const nl = document.getElementById('modal-notion-link');
     if(b.url) { nl.href=b.url; nl.style.display='inline-flex'; }
     else nl.style.display='none';
-    document.getElementById('modal-overlay').classList.add('open');
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+    });
     history.replaceState(null,'',`?id=${id}`);
   }
 
   function closeModal(e) {
-    if(e.target===document.getElementById('modal-overlay')) {
-      document.getElementById('modal-overlay').classList.remove('open');
+    const overlay = document.getElementById('modal-overlay');
+    if(e.target===overlay) {
+      overlay.classList.remove('open');
+      // 트랜지션 완료 후 display 숨김
+      setTimeout(() => { overlay.style.display = ''; }, 350);
       history.replaceState(null,'',location.pathname);
     }
   }
@@ -822,7 +884,7 @@
 
   window.addEventListener('scroll',()=>{
     document.getElementById('scroll-top')?.classList.toggle('visible',window.scrollY>300);
-  });
+  }, { passive: true });
 
   loadData();
   </script>
