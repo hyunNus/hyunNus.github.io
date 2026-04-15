@@ -179,13 +179,16 @@
     </div>
 
     <!-- 프로필 -->
-    <div class="profile-header" style="margin-top: var(--gap-xl);">
-      <div class="profile-avatar">🧑‍🌾</div>
-      <div>
-        <p class="profile-greeting">👋 Hi, I'm <strong>Hyunwoo Lee</strong>.</p>
+    <div class="profile-header" style="margin-top: var(--gap-xl); display: flex; flex-direction: column; align-items: center; text-align: center;">
+      <!-- 프로필 사진 -->
+      <img src="./assets/img/profile.webp" alt="Hyunwoo Lee" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; margin-bottom: var(--gap-md); border: 3px solid var(--accent-soft); box-shadow: 0 4px 12px rgba(0,0,0,0.15);"/>
+      
+      <!-- 텍스트 섹션 -->
+      <div style="max-width: 600px;">
+        <p class="profile-greeting" style="margin-bottom: var(--gap-sm);">👋 Hi, I'm <strong>Hyunwoo Lee</strong>.</p>
         <p class="profile-desc">I'm currently a student at Hankuk University of Foreign Studies, majoring in Social Science &amp; AI Convergence. My technical interests lie in NLP, Fine-tuning, and Reinforcement Learning, with a focus on HCI.</p>
-        <p class="profile-desc" style="margin-bottom:var(--gap-sm)">This blog is a personal archive of my technical explorations. I hope you find some interesting bits to read.</p>
-        <div class="profile-tags">
+        <p class="profile-desc" style="margin-bottom:var(--gap-md)">This blog is a personal archive of my technical explorations. I hope you find some interesting bits to read.</p>
+        <div class="profile-tags" style="display: flex; justify-content: center; gap: var(--gap-sm); flex-wrap: wrap;">
           <span class="tag">NLP</span>
           <span class="tag">Fine-tuning</span>
           <span class="tag">RL</span>
