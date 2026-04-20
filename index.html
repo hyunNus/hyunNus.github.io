@@ -149,7 +149,7 @@
     <!-- 프로필 -->
     <div class="profile-header" style="margin-top: var(--gap-xl); display: flex; flex-direction: column; align-items: center; text-align: center;">
       <!-- 프로필 사진 -->
-      <img src="./assets/img/profile.webp" alt="Hyunwoo Lee" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; margin-bottom: var(--gap-md); border: 3px solid var(--accent-soft); box-shadow: 0 4px 12px rgba(0,0,0,0.15);"/>
+      <img src="./assets/img/profile.webp" alt="Hyunwoo Lee" style="width: 98px; height: 98px; border-radius: 50%; object-fit: cover; margin-bottom: var(--gap-md); border: 2px solid var(--accent-soft); box-shadow: 0 2px 8px rgba(0,0,0,0.12);"/>
       
       <!-- 텍스트 섹션 -->
       <div style="max-width: 600px;">
@@ -173,27 +173,11 @@
       <div class="stat-card"><span class="stat-value" id="stat-tags">0</span><span class="stat-label">태그</span></div>
     </div>
 
-    <!-- 사과 나무 시스템 (활동 기록 상단) -->
-    <div style="margin-bottom: var(--gap-lg);">
-      <canvas id="apple-tree-canvas" width="400" height="300" style="width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
-    </div>
-
-    <!-- 활동 캘린더 -->
-    <div class="cal-wrap">
-      <div class="cal-header">
-        <span class="cal-title">✦ 활동 기록</span>
-        <div class="cal-legend">
-          <span>적음</span>
-          <span class="legend-dot" style="background:var(--accent-soft);opacity:0.4;border:1px solid var(--card-border)"></span>
-          <span class="legend-dot" style="background:var(--accent);opacity:0.35"></span>
-          <span class="legend-dot" style="background:var(--accent);opacity:0.55"></span>
-          <span class="legend-dot" style="background:var(--accent);opacity:0.78"></span>
-          <span class="legend-dot" style="background:var(--accent);opacity:1"></span>
-          <span>많음</span>
-        </div>
-      </div>
-      <div class="cal-months" id="cal-months"></div>
-      <div class="cal-grid"   id="cal-grid"></div>
+    <!-- Floating Island 시스템 -->
+    <div style="margin-bottom: var(--gap-xl); text-align: center;">
+      <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: var(--gap-md); font-family: var(--font-pixel); letter-spacing: 1px;">🏝️ LEARNING ISLAND</h3>
+      <canvas id="floating-island-canvas" width="500" height="280" style="width: 100%; height: auto; display: block; margin: 0 auto; max-width: 500px; border-radius: 8px; background: linear-gradient(180deg, rgba(100,150,200,0.1) 0%, rgba(50,100,150,0.05) 100%);"></canvas>
+      <p style="font-size: 11px; color: var(--text-secondary); margin-top: var(--gap-sm); font-family: var(--font-pixel); letter-spacing: 0.5px;">TIL이 쌓일수록 섬이 풍요로워집니다</p>
     </div>
 
     <!-- 최근 TIL -->
@@ -1074,58 +1058,107 @@
   }
 
   // ══════════════════════════════════════════════════════════
-  //  사과 나무 시스템
+  //  Floating Island 시스템
   // ══════════════════════════════════════════════════════════
-  function drawAppleTree() {
-    const canvas = document.getElementById('apple-tree-canvas');
+  function drawFloatingIsland() {
+    const canvas = document.getElementById('floating-island-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const w = canvas.width, h = canvas.height;
     const tilCount = (TIL.items || []).length;
     
-    // 배경
-    ctx.fillStyle = 'rgba(240, 235, 220, 0.3)';
+    // 배경 그라데이션
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(135, 206, 235, 0.1)');
+    grad.addColorStop(1, 'rgba(70, 130, 180, 0.05)');
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
     
-    // 나무 줄기
-    ctx.fillStyle = '#8B6F47';
-    ctx.fillRect(w/2 - 12, h/2 + 20, 24, 80);
-    
-    // 나무 잎 (원형)
-    ctx.fillStyle = '#4A7C59';
+    // 섬 그리기
+    ctx.fillStyle = '#8B7355';
     ctx.beginPath();
-    ctx.arc(w/2, h/2 - 30, 60, 0, Math.PI * 2);
+    ctx.ellipse(w/2, h/2 + 40, 120, 60, 0, 0, Math.PI * 2);
     ctx.fill();
     
-    // 사과 그리기 (TIL 개수만큼)
-    const applePositions = [
-      {x: w/2 - 40, y: h/2 - 60}, {x: w/2 + 40, y: h/2 - 60},
-      {x: w/2 - 50, y: h/2 - 20}, {x: w/2 + 50, y: h/2 - 20},
-      {x: w/2 - 30, y: h/2 - 50}, {x: w/2 + 30, y: h/2 - 50},
-      {x: w/2 - 60, y: h/2 - 30}, {x: w/2 + 60, y: h/2 - 30},
-      {x: w/2, y: h/2 - 70}, {x: w/2 - 20, y: h/2 - 70}
-    ];
+    // 섬 그림자
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.beginPath();
+    ctx.ellipse(w/2 + 5, h/2 + 50, 115, 55, 0, 0, Math.PI * 2);
+    ctx.fill();
     
-    // 사과 그리기
-    for (let i = 0; i < Math.min(tilCount, applePositions.length); i++) {
-      const pos = applePositions[i];
-      ctx.fillStyle = '#E63946';
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // 사과 광택
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.beginPath();
-      ctx.arc(pos.x - 3, pos.y - 3, 3, 0, Math.PI * 2);
-      ctx.fill();
+    // 풀 (섬 위)
+    ctx.fillStyle = '#6B9D3A';
+    for (let i = 0; i < 15; i++) {
+      const x = w/2 - 100 + (i * 15);
+      const y = h/2 + 20;
+      ctx.fillRect(x, y, 3, 15);
     }
     
-    // 사과 개수 텍스트
+    // TIL 개수에 따른 오브젝트 배치
+    const objects = [];
+    
+    // 0-10: 나무
+    if (tilCount >= 3) {
+      objects.push({type: 'tree', x: w/2 - 50, y: h/2 - 10});
+    }
+    // 11-20: 꽃
+    if (tilCount >= 10) {
+      objects.push({type: 'flower', x: w/2 + 40, y: h/2 - 20});
+    }
+    // 21-30: 작은 집
+    if (tilCount >= 20) {
+      objects.push({type: 'house', x: w/2, y: h/2 - 30});
+    }
+    // 31+: 랜턴
+    if (tilCount >= 30) {
+      objects.push({type: 'lantern', x: w/2 - 70, y: h/2 - 40});
+    }
+    
+    // 오브젝트 렌더링
+    objects.forEach(obj => {
+      if (obj.type === 'tree') {
+        ctx.fillStyle = '#654321';
+        ctx.fillRect(obj.x - 3, obj.y + 15, 6, 20);
+        ctx.fillStyle = '#228B22';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (obj.type === 'flower') {
+        ctx.fillStyle = '#FFB6C1';
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(obj.x + Math.cos(angle) * 5, obj.y + Math.sin(angle) * 5, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (obj.type === 'house') {
+        ctx.fillStyle = '#A0522D';
+        ctx.fillRect(obj.x - 8, obj.y, 16, 12);
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath();
+        ctx.moveTo(obj.x - 10, obj.y);
+        ctx.lineTo(obj.x, obj.y - 6);
+        ctx.lineTo(obj.x + 10, obj.y);
+        ctx.fill();
+      } else if (obj.type === 'lantern') {
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(obj.x - 3, obj.y, 6, 10);
+        ctx.fillStyle = '#FFA500';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    
+    // TIL 개수 텍스트
     ctx.fillStyle = '#333';
-    ctx.font = 'bold 18px "Press Start 2P", monospace';
+    ctx.font = 'bold 14px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`🍎 ${tilCount}개`, w/2, h - 20);
+    ctx.fillText(`${tilCount} TILs`, w/2, h - 15);
   }
 
   // ══════════════════════════════════════════════════════════
@@ -1144,7 +1177,7 @@
     const tilCount = tilItems.length;
     startFarmCanvas(tilCount, tilItems);
     setStats();
-    drawAppleTree();
+    drawFloatingIsland();
     setCalendar();
     setTIL();
     setBooks();
