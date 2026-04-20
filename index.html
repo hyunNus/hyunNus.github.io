@@ -173,30 +173,9 @@
       <div class="stat-card"><span class="stat-value" id="stat-tags">0</span><span class="stat-label">태그</span></div>
     </div>
 
-    <!-- 농장 성장 현황 (활동 기록 상단) -->
-    <div class="growth-wrap" id="growth-wrap-main" style="margin-bottom: var(--gap-lg);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--gap-md);">
-        <div class="growth-title">✦ 농장 성장 현황</div>
-        <div style="font-size: 0.9rem; color: var(--text-secondary);">
-          <span id="growth-cycle">1회차</span> | 
-          <span id="growth-date">0000년 0월 0일</span> 
-          <span id="growth-time">00:00</span>
-        </div>
-      </div>
-      <div class="growth-stages" id="growth-stages-main">
-        <div class="growth-stage reached" data-min="0"><span class="growth-stage-icon">🌱</span><span class="growth-stage-label">씨앗<br>0~</span></div>
-        <div class="growth-connector"><div class="growth-fill" id="gf-main-1" style="width:0%"></div></div>
-        <div class="growth-stage" data-min="5"><span class="growth-stage-icon">🌿</span><span class="growth-stage-label">새싹<br>5~</span></div>
-        <div class="growth-connector"><div class="growth-fill" id="gf-main-2" style="width:0%"></div></div>
-        <div class="growth-stage" data-min="15"><span class="growth-stage-icon">🌸</span><span class="growth-stage-label">꽃봉오리<br>15~</span></div>
-        <div class="growth-connector"><div class="growth-fill" id="gf-main-3" style="width:0%"></div></div>
-        <div class="growth-stage" data-min="30"><span class="growth-stage-icon">🌻</span><span class="growth-stage-label">꽃<br>30~</span></div>
-        <div class="growth-connector"><div class="growth-fill" id="gf-main-4" style="width:0%"></div></div>
-        <div class="growth-stage" data-min="60"><span class="growth-stage-icon">🌳</span><span class="growth-stage-label">나무<br>60~</span></div>
-        <div class="growth-connector"><div class="growth-fill" id="gf-main-5" style="width:0%"></div></div>
-        <div class="growth-stage" data-min="100"><span class="growth-stage-icon">🏡</span><span class="growth-stage-label">농장<br>100~</span></div>
-      </div>
-      <div class="growth-hint" id="growth-hint-main">TIL을 작성하면 농장이 성장해요!</div>
+    <!-- 사과 나무 시스템 (활동 기록 상단) -->
+    <div style="margin-bottom: var(--gap-lg);">
+      <canvas id="apple-tree-canvas" width="400" height="300" style="width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
     </div>
 
     <!-- 활동 캘린더 -->
@@ -1095,6 +1074,61 @@
   }
 
   // ══════════════════════════════════════════════════════════
+  //  사과 나무 시스템
+  // ══════════════════════════════════════════════════════════
+  function drawAppleTree() {
+    const canvas = document.getElementById('apple-tree-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const tilCount = (TIL.items || []).length;
+    
+    // 배경
+    ctx.fillStyle = 'rgba(240, 235, 220, 0.3)';
+    ctx.fillRect(0, 0, w, h);
+    
+    // 나무 줄기
+    ctx.fillStyle = '#8B6F47';
+    ctx.fillRect(w/2 - 12, h/2 + 20, 24, 80);
+    
+    // 나무 잎 (원형)
+    ctx.fillStyle = '#4A7C59';
+    ctx.beginPath();
+    ctx.arc(w/2, h/2 - 30, 60, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 사과 그리기 (TIL 개수만큼)
+    const applePositions = [
+      {x: w/2 - 40, y: h/2 - 60}, {x: w/2 + 40, y: h/2 - 60},
+      {x: w/2 - 50, y: h/2 - 20}, {x: w/2 + 50, y: h/2 - 20},
+      {x: w/2 - 30, y: h/2 - 50}, {x: w/2 + 30, y: h/2 - 50},
+      {x: w/2 - 60, y: h/2 - 30}, {x: w/2 + 60, y: h/2 - 30},
+      {x: w/2, y: h/2 - 70}, {x: w/2 - 20, y: h/2 - 70}
+    ];
+    
+    // 사과 그리기
+    for (let i = 0; i < Math.min(tilCount, applePositions.length); i++) {
+      const pos = applePositions[i];
+      ctx.fillStyle = '#E63946';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 사과 광택
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.beginPath();
+      ctx.arc(pos.x - 3, pos.y - 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // 사과 개수 텍스트
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 18px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`🍎 ${tilCount}개`, w/2, h - 20);
+  }
+
+  // ══════════════════════════════════════════════════════════
   //  동기화 태그
   // ══════════════════════════════════════════════════════════
   function setSyncTag() {
@@ -1110,7 +1144,7 @@
     const tilCount = tilItems.length;
     startFarmCanvas(tilCount, tilItems);
     setStats();
-    setGrowth();
+    drawAppleTree();
     setCalendar();
     setTIL();
     setBooks();
