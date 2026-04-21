@@ -29,9 +29,9 @@ jobs:
         run: node fetch-notion.js
         working-directory: ./scripts
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_API_KEY }}
-          NOTION_TIL_DB_ID: ${{ secrets.NOTION_TIL_DATABASE_ID }}
-          NOTION_BOOKS_DB_ID: ${{ secrets.NOTION_BOOKS_DATABASE_ID }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_TIL_DB_ID: ${{ secrets.NOTION_TIL_DB_ID }}
+          NOTION_BOOKS_DB_ID: ${{ secrets.NOTION_BOOKS_DB_ID }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
