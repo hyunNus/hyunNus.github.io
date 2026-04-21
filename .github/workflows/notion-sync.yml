@@ -23,9 +23,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./scripts
 
       - name: Fetch Notion data
-        run: node scripts/fetch-notion.js
+        run: node fetch-notion.js
+        working-directory: ./scripts
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_TIL_DATABASE_ID: ${{ secrets.NOTION_TIL_DATABASE_ID }}
