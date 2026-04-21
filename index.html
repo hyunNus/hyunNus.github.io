@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hyunwoo Lee</title>
+  <meta name="description" content="Personal blog of Hyunwoo Lee — NLP, Fine-tuning, Reinforcement Learning, HCI.">
+  <link rel="stylesheet" href="/assets/css/farm.css">
+  <style>
+    /* ── 농장 씬 (Canvas 기반) ──────────────────────── */
+    .farm-scene {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 3px solid var(--card-border);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: var(--gap-xl);
+      background: #87CEEB;
+      cursor: default;
+    }
+    #farm-canvas {
+      display: block;
+      width: 100%;
+      image-rendering: pixelated;
+    }
+    .scene-badge {
+      position: absolute; z-index: 20;
+      background: rgba(255,255,255,0.88);
+      border: 2px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 7px 11px;
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--text-primary);
+      backdrop-filter: blur(4px);
+      line-height: 1.8;
+    }
+    .date-badge   { top: 14px; left: 14px; }
+    .season-badge { top: 14px; right: 14px; display: flex; align-items: center; gap: 6px; }
+
+    /* ── 프로필 ──────────────────────────────────── */
+    .profile-header {
+      display: flex; align-items: flex-start; gap: var(--gap-lg);
+      margin-bottom: var(--gap-xl);
+    }
+    .profile-avatar {
+      width: 76px; height: 76px; border: 3px solid var(--card-border);
+      border-radius: var(--radius-md); background: var(--accent-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; flex-shrink: 0;
+    }
+    .profile-name { font-family: var(--font-pixel); font-size: 15px; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.4; }
+    .profile-greeting { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.4; }
+    .profile-greeting strong { color: var(--accent); }
+    .profile-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: var(--gap-sm); }
+    .profile-tags { display: flex; flex-wrap: wrap; gap: var(--gap-xs); }
+
+    /* ── 성장 바 ─────────────────────────────────── */
+    .growth-wrap {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: var(--radius-lg); padding: var(--gap-lg);
+      margin-bottom: var(--gap-xl);
+    }
+    .growth-title { font-family: var(--font-pixel); font-size: 9px; color: var(--text-primary); margin-bottom: var(--gap-md); }
+    .growth-stages { display: flex; align-items: center; gap: var(--gap-sm); margin-bottom: var(--gap-sm); }
+    .growth-stage { display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.3; transition: opacity 0.6s; }
+    .growth-stage.reached { opacity: 1; }
+    .growth-stage-icon  { font-size: 18px; }
+    .growth-stage-label { font-family: var(--font-pixel); font-size: 6px; color: var(--text-muted); text-align: center; }
+    .growth-connector   { flex: 1; height: 4px; background: var(--card-border); border-radius: 2px; position: relative; overflow: hidden; }
+    .growth-fill        { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); border-radius: 2px; transition: width 1.2s ease; }
+    .growth-hint        { font-family: var(--font-pixel); font-size: 8px; color: var(--text-muted); text-align: right; }
+
+    /* ── 캘린더 ──────────────────────────────────── */
+    .cal-wrap {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: var(--radius-lg); padding: var(--gap-lg);
+      margin-bottom: var(--gap-xl); overflow-x: auto;
+    }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--gap-md); flex-wrap: wrap; gap: var(--gap-sm); }
+    .cal-title  { font-family: var(--font-pixel); font-size: 10px; color: var(--text-primary); }
+    .cal-legend { display: flex; align-items: center; gap: 5px; font-family: var(--font-pixel); font-size: 7px; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .cal-months { display: flex; gap: 2px; margin-bottom: 4px; min-width: max-content; }
+    .cal-month-lbl { font-family: var(--font-pixel); font-size: 6px; color: var(--text-muted); flex: 0 0 auto; }
+    .cal-grid  { display: flex; gap: 2px; min-width: max-content; }
+    .cal-week  { display: flex; flex-direction: column; gap: 2px; }
+    .cal-day   { width: 11px; height: 11px; border-radius: 2px; cursor: pointer; transition: transform 0.15s; position: relative; }
+    .cal-day:hover { transform: scale(1.6); z-index: 10; }
+    .cal-day.l0 { background: var(--accent-soft); opacity: 0.35; border: 1px solid var(--card-border); }
+    .cal-day.l1 { background: var(--accent); opacity: 0.35; }
+    .cal-day.l2 { background: var(--accent); opacity: 0.55; }
+    .cal-day.l3 { background: var(--accent); opacity: 0.78; }
+    .cal-day.l4 { background: var(--accent); opacity: 1; }
+    .cal-day.today { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+    /* ── TIL 카드 ────────────────────────────────── */
+    .til-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--gap-md); }
+    .til-card {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: var(--radius-md); padding: var(--gap-md);
+      cursor: pointer; transition: all var(--transition); position: relative; overflow: hidden;
+    }
+    .til-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+    .til-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--accent); }
+    .til-cat    { font-family: var(--font-pixel); font-size: 7px; color: var(--accent); margin-bottom: var(--gap-sm); }
+    .til-title  { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--gap-sm); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .til-summary{ font-size: 12px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: var(--gap-sm); }
+    .til-footer { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-sm); flex-wrap: wrap; }
+    .til-date   { font-family: var(--font-pixel); font-size: 7px; color: var(--text-muted); }
+
+    /* ── 독서 미니 카드 ──────────────────────────── */
+    .book-mini-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--gap-md); }
+    .book-mini-card {
+      background: var(--card-bg); border: 2px solid var(--card-border);
+      border-radius: var(--radius-md); padding: var(--gap-md);
+      cursor: pointer; transition: all var(--transition);
+      display: flex; gap: var(--gap-sm); align-items: flex-start;
+    }
+    .book-mini-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+    .book-mini-icon   { font-size: 26px; flex-shrink: 0; }
+    .book-mini-info   { flex: 1; min-width: 0; }
+    .book-mini-title  { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .book-mini-author { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .book-mini-status { font-family: var(--font-pixel); font-size: 7px; padding: 3px 6px; border-radius: 2px; }
+
+    @media (max-width: 600px) {
+      .profile-header { flex-direction: column; }
+      .growth-stages  { flex-wrap: wrap; justify-content: center; }
+      .growth-connector { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Hyunwoo Lee</a>
+      <ul class="nav-links">
+        <li><a href="/" class="active">HOME</a></li>
+        <li><a href="/pages/til/">TIL</a></li>
+        <li><a href="/pages/life-os/">BOOKS</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+
+    <!-- 프로필 -->
+    <div class="profile-header" style="margin-top: var(--gap-xl); display: flex; flex-direction: column; align-items: center; text-align: center;">
+      <!-- 프로필 사진 -->
+      <img src="./assets/img/profile.webp" alt="Hyunwoo Lee" style="width: 98px; height: 98px; border-radius: 50%; object-fit: cover; margin-bottom: var(--gap-md); border: 2px solid var(--accent-soft); box-shadow: 0 2px 8px rgba(0,0,0,0.12);"/>
+      
+      <!-- 텍스트 섹션 -->
+      <div style="max-width: 600px;">
+        <p class="profile-greeting" style="margin-bottom: var(--gap-sm);">👋 Hi, I'm <strong>Hyunwoo Lee</strong>.</p>
+        <p class="profile-desc">I'm currently a student at Hankuk University of Foreign Studies, majoring in Social Science &amp; AI Convergence. My technical interests lie in NLP, Fine-tuning, and Reinforcement Learning, with a focus on HCI.</p>
+        <p class="profile-desc" style="margin-bottom:var(--gap-md)">This blog is a personal archive of my technical explorations. I hope you find some interesting bits to read.</p>
+        <div class="profile-tags" style="display: flex; justify-content: center; gap: var(--gap-sm); flex-wrap: wrap;">
+          <span class="tag">NLP</span>
+          <span class="tag">Fine-tuning</span>
+          <span class="tag">RL</span>
+          <span class="tag">HCI</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="stats-grid" style="margin-bottom:var(--gap-xl)">
+      <div class="stat-card"><span class="stat-value" id="stat-til">0</span><span class="stat-label">TIL 작성</span></div>
+      <div class="stat-card"><span class="stat-value" id="stat-books">0</span><span class="stat-label">완독</span></div>
+      <div class="stat-card"><span class="stat-value" id="stat-reading">0</span><span class="stat-label">읽는 중</span></div>
+      <div class="stat-card"><span class="stat-value" id="stat-tags">0</span><span class="stat-label">태그</span></div>
+    </div>
+
+    <!-- Floating Island 시스템 -->
+    <div style="margin-bottom: var(--gap-xl); text-align: center;">
+      <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: var(--gap-md); font-family: var(--font-pixel); letter-spacing: 1px;">🏝️ LEARNING ISLAND</h3>
+      <canvas id="floating-island-canvas" width="500" height="280" style="width: 100%; height: auto; display: block; margin: 0 auto; max-width: 500px; border-radius: 8px; background: linear-gradient(180deg, rgba(100,150,200,0.1) 0%, rgba(50,100,150,0.05) 100%);"></canvas>
+      <p style="font-size: 11px; color: var(--text-secondary); margin-top: var(--gap-sm); font-family: var(--font-pixel); letter-spacing: 0.5px;">TIL이 쌓일수록 섬이 풍요로워집니다</p>
+    </div>
+
+    <!-- 최근 TIL -->
+    <div class="section-header">
+      <span class="section-title">최근 TIL</span>
+      <a href="/pages/til/" class="btn btn-outline">전체 보기 →</a>
+    </div>
+    <div id="til-wrap" style="margin-bottom:var(--gap-xl)">
+      <div class="empty-state">
+        <span class="empty-state-icon">🌱</span>
+        <div class="empty-state-title">No posts yet.</div>
+        <a href="/pages/til/" class="btn btn-primary">Go to TIL →</a>
+      </div>
+    </div>
+
+    <!-- 독서 기록 -->
+    <div class="section-header">
+      <span class="section-title">독서 기록</span>
+      <a href="/pages/life-os/" class="btn btn-outline">전체 보기 →</a>
+    </div>
+    <div id="books-wrap">
+      <div class="empty-state">
+        <span class="empty-state-icon">📚</span>
+        <div class="empty-state-title">No books yet.</div>
+        <a href="/pages/life-os/" class="btn btn-primary">Go to Books →</a>
+      </div>
+    </div>
+
+
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-text">Hyunwoo Lee · Powered by Notion &amp; GitHub Pages</div>
+    <ul class="footer-links">
+      <li><a href="/pages/til/">TIL</a></li>
+      <li><a href="/pages/life-os/">Books</a></li>
+      <li><a href="https://github.com/hyunNus/hyunNus.github.io" target="_blank">GitHub</a></li>
+    </ul>
+  </footer>
+
+  <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <script>
+  // ══════════════════════════════════════════════════════════
+  //  계절 결정
+  // ══════════════════════════════════════════════════════════
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  const season = m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';
+  document.documentElement.setAttribute('data-season', season);
+
+  const SEASON_INFO = {
+    spring: { emoji:'🌸', name:'봄',   skyTop:'#87CEEB', skyBot:'#B0E2FF', ground:'#7CB87A', groundDark:'#5A9457', particleColor:'#F48FB1', cloudColor:'#FFFFFF' },
+    summer: { emoji:'☀️', name:'여름', skyTop:'#1A6B9A', skyBot:'#4AADE0', ground:'#4A8C3F', groundDark:'#2E6B24', particleColor:'#FFF9C4', cloudColor:'#FFFFFF' },
+    autumn: { emoji:'🍂', name:'가을', skyTop:'#D2691E', skyBot:'#F4A460', ground:'#8B6914', groundDark:'#6B4F0A', particleColor:'#FF8A65', cloudColor:'#FFE0B2' },
+    winter: { emoji:'❄️', name:'겨울', skyTop:'#2C3E6B', skyBot:'#5B7FA6', ground:'#B8D4E8', groundDark:'#8AADCC', particleColor:'#E3F2FD', cloudColor:'#CFE8F8' },
+  };
+  const si = SEASON_INFO[season];
+
+  document.getElementById('date-text').textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
+  document.getElementById('time-text').textContent = now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('season-emoji').textContent = si.emoji;
+  document.getElementById('season-name').textContent  = si.name;
+
+  // ══════════════════════════════════════════════════════════
+  //  데이터 로드
+  // ══════════════════════════════════════════════════════════
+  let TIL = {count:0, items:[]};
+  let BOOKS = {count:0, items:[]};
+
+  async function loadData() {
+    try {
+      const [t, b] = await Promise.all([
+        fetch('/data/til.json').then(r=>r.json()),
+        fetch('/data/books.json').then(r=>r.json()),
+      ]);
+      TIL = t; BOOKS = b;
+    } catch(e) {}
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  픽셀아트 Canvas 농장 씬
+  // ══════════════════════════════════════════════════════════
+  const SCALE = 3; // 픽셀 배율
+
+  // 색상 팔레트
+  const P = {
+    // 공통
+    black:   '#1A0A00',
+    white:   '#FFFDF7',
+    outline: '#3D2B1F',
+
+    // 피부/머리카락
+    skin:    '#FDBCB4',
+    skinD:   '#E8967A',
+    hair:    '#5C3A1E',
+    hairH:   '#7A4E2D',
+
+    // 옷 (계절별)
+    shirt:   season==='winter'?'#4A7FA0':season==='autumn'?'#C0622A':'#5A9457',
+    shirtD:  season==='winter'?'#2A5F80':season==='autumn'?'#9A4210':'#3A7437',
+    pants:   '#5C3A1E',
+    pantsD:  '#3D2010',
+    hat:     season==='winter'?'#B8D4E8':'#D4A017',
+    hatD:    season==='winter'?'#8AADCC':'#A07810',
+    hatBand: season==='winter'?'#4A7FA0':'#5A9457',
+
+    // 도구
+    tool:    '#8B6914',
+    toolH:   '#C4A020',
+    toolMet: '#9E9E9E',
+    toolMetD:'#616161',
+    water:   '#4AADE0',
+    waterL:  '#87CEEB',
+    seed:    '#8B4513',
+
+    // 땅/밭
+    soil:    '#6B3A2A',
+    soilD:   '#4A2010',
+    soilL:   '#8B5A3A',
+    grass:   si.ground,
+    grassD:  si.groundDark,
+
+    // 식물
+    plantG:  '#4CAF50',
+    plantGD: '#2E7D32',
+    plantGL: '#81C784',
+    flower1: season==='spring'?'#F48FB1':season==='summer'?'#FFD54F':season==='autumn'?'#FF8A65':'#B0BEC5',
+    flower2: season==='spring'?'#CE93D8':season==='summer'?'#AED581':season==='autumn'?'#FFCC02':'#90CAF9',
+    flowerC: '#FFF9C4',
+
+    // 나무
+    trunk:   '#795548',
+    trunkD:  '#4E342E',
+    leaf:    season==='autumn'?'#FF8A65':season==='winter'?'#B0BEC5':'#388E3C',
+    leafL:   season==='autumn'?'#FFCC80':season==='winter'?'#CFE8F8':'#66BB6A',
+
+    // 집
+    wall:    '#F5DEB3',
+    wallD:   '#D2B48C',
+    roof:    '#C0392B',
+    roofD:   '#922B21',
+    door:    '#8B4513',
+    window:  '#87CEEB',
+    chimney: '#795548',
+    smoke:   '#B0BEC5',
+
+    // 구름
+    cloud:   si.cloudColor,
+    cloudD:  '#E0E0E0',
+
+    // 울타리
+    fence:   '#D4B896',
+    fenceD:  '#A0876A',
+  };
+
+  // ── 픽셀 그리기 헬퍼 ──────────────────────────────────────
+  function px(ctx, x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x*SCALE, y*SCALE, w*SCALE, h*SCALE);
+  }
+
+  // ── 농부 캐릭터 그리기 (32×48 픽셀 기준) ─────────────────
+  // 제거됨 - 캐릭터 없이 나무/밭만 표시
+  function drawFarmer(ctx, ox, oy, mood, frame) {
+    return; // 캐릭터 렌더링 비활성화
+    // mood: 'happy'|'normal'|'sad'|'excited'
+    // frame: 0|1 (걷기 프레임)
+
+    const legOff = frame===1 ? 1 : 0;
+
+    // 그림자
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.ellipse((ox+8)*SCALE, (oy+46)*SCALE, 8*SCALE, 2*SCALE, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // 다리
+    px(ctx, ox+4, oy+36+legOff, 4, 10-legOff, P.pants);
+    px(ctx, ox+8, oy+36-legOff, 4, 10+legOff, P.pants);
+    px(ctx, ox+4, oy+36+legOff, 4, 2, P.pantsD);
+    px(ctx, ox+8, oy+36-legOff, 4, 2, P.pantsD);
+    // 신발
+    px(ctx, ox+3, oy+45+legOff, 5, 2, P.outline);
+    px(ctx, ox+8, oy+45-legOff, 5, 2, P.outline);
+
+    // 몸통
+    px(ctx, ox+3, oy+22, 10, 14, P.shirt);
+    px(ctx, ox+3, oy+22, 10, 2,  P.shirtD);
+    px(ctx, ox+3, oy+34, 10, 2,  P.shirtD);
+    // 단추
+    px(ctx, ox+7, oy+26, 1, 1, P.white);
+    px(ctx, ox+7, oy+29, 1, 1, P.white);
+    px(ctx, ox+7, oy+32, 1, 1, P.white);
+
+    // 팔 (도구 들기)
+    if(mood==='happy') {
+      // 물뿌리개 들기
+      px(ctx, ox+13, oy+22, 3, 10, P.shirt);  // 오른팔
+      px(ctx, ox+0,  oy+22, 3, 10, P.shirt);  // 왼팔
+      // 물뿌리개
+      px(ctx, ox+16, oy+22, 5, 4, P.toolMet);
+      px(ctx, ox+16, oy+22, 5, 1, P.toolMetD);
+      px(ctx, ox+21, oy+24, 1, 6, P.toolMet);
+      px(ctx, ox+21, oy+30, 3, 1, P.water);
+      px(ctx, ox+22, oy+31, 1, 2, P.water);
+      px(ctx, ox+23, oy+30, 1, 3, P.waterL);
+      // 물방울
+      px(ctx, ox+22, oy+33, 1, 2, P.water);
+      px(ctx, ox+24, oy+34, 1, 1, P.waterL);
+    } else if(mood==='excited') {
+      // 씨앗 심기 (양팔 올리기)
+      px(ctx, ox+13, oy+20, 3, 8, P.shirt);
+      px(ctx, ox+0,  oy+20, 3, 8, P.shirt);
+      // 씨앗
+      px(ctx, ox+14, oy+18, 3, 3, P.seed);
+      px(ctx, ox+15, oy+17, 1, 1, P.seedL||'#A0522D');
+    } else if(mood==='sad') {
+      // 팔 내리기
+      px(ctx, ox+13, oy+24, 3, 12, P.shirt);
+      px(ctx, ox+0,  oy+24, 3, 12, P.shirt);
+    } else {
+      // 일반 (삽 들기)
+      px(ctx, ox+13, oy+22, 3, 10, P.shirt);
+      px(ctx, ox+0,  oy+22, 3, 10, P.shirt);
+      // 삽
+      px(ctx, ox+16, oy+16, 2, 16, P.tool);
+      px(ctx, ox+15, oy+30, 4, 5, P.toolMet);
+      px(ctx, ox+15, oy+30, 4, 1, P.toolMetD);
+    }
+
+    // 목
+    px(ctx, ox+6, oy+18, 4, 4, P.skin);
+
+    // 머리
+    px(ctx, ox+4, oy+8, 8, 10, P.skin);
+    // 귀
+    px(ctx, ox+3, oy+10, 1, 4, P.skin);
+    px(ctx, ox+12, oy+10, 1, 4, P.skin);
+    px(ctx, ox+3, oy+11, 1, 2, P.skinD);
+    px(ctx, ox+12, oy+11, 1, 2, P.skinD);
+
+    // 눈
+    if(mood==='sad') {
+      // 슬픈 눈 (아래로 처진)
+      px(ctx, ox+5, oy+12, 2, 1, P.outline);
+      px(ctx, ox+9, oy+12, 2, 1, P.outline);
+      px(ctx, ox+5, oy+11, 1, 1, P.outline);
+      px(ctx, ox+10, oy+11, 1, 1, P.outline);
+    } else if(mood==='excited') {
+      // 반짝이는 눈 (별 모양)
+      px(ctx, ox+5, oy+11, 2, 2, P.outline);
+      px(ctx, ox+9, oy+11, 2, 2, P.outline);
+      px(ctx, ox+6, oy+10, 1, 1, '#FFD700');
+      px(ctx, ox+10, oy+10, 1, 1, '#FFD700');
+    } else if(mood==='happy') {
+      // 행복한 눈 (초승달)
+      px(ctx, ox+5, oy+11, 2, 1, P.outline);
+      px(ctx, ox+9, oy+11, 2, 1, P.outline);
+      px(ctx, ox+5, oy+12, 1, 1, P.outline);
+      px(ctx, ox+10, oy+12, 1, 1, P.outline);
+    } else {
+      px(ctx, ox+5, oy+11, 2, 2, P.outline);
+      px(ctx, ox+9, oy+11, 2, 2, P.outline);
+    }
+
+    // 입
+    if(mood==='sad') {
+      px(ctx, ox+6, oy+15, 4, 1, P.outline);
+      px(ctx, ox+5, oy+16, 1, 1, P.outline);
+      px(ctx, ox+10, oy+16, 1, 1, P.outline);
+    } else if(mood==='happy'||mood==='excited') {
+      px(ctx, ox+6, oy+15, 4, 1, P.outline);
+      px(ctx, ox+5, oy+14, 1, 1, P.outline);
+      px(ctx, ox+10, oy+14, 1, 1, P.outline);
+      px(ctx, ox+6, oy+16, 4, 1, P.skinD);
+    } else {
+      px(ctx, ox+6, oy+15, 4, 1, P.outline);
+    }
+
+    // 볼터치 (행복/흥분)
+    if(mood==='happy'||mood==='excited') {
+      ctx.fillStyle = 'rgba(255,150,150,0.4)';
+      ctx.beginPath();
+      ctx.ellipse((ox+5)*SCALE, (oy+14)*SCALE, 2*SCALE, 1*SCALE, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse((ox+11)*SCALE, (oy+14)*SCALE, 2*SCALE, 1*SCALE, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // 슬픔 눈물
+    if(mood==='sad') {
+      ctx.fillStyle = 'rgba(100,180,255,0.7)';
+      ctx.fillRect((ox+6)*SCALE, (oy+13)*SCALE, 1*SCALE, 3*SCALE);
+      ctx.fillRect((ox+10)*SCALE, (oy+13)*SCALE, 1*SCALE, 2*SCALE);
+    }
+
+    // 모자
+    px(ctx, ox+3, oy+8, 10, 2, P.hat);
+    px(ctx, ox+4, oy+3, 8, 6, P.hat);
+    px(ctx, ox+4, oy+3, 8, 1, P.hatD);
+    px(ctx, ox+5, oy+7, 6, 2, P.hatBand);
+    // 모자 장식
+    if(season==='spring') {
+      px(ctx, ox+8, oy+3, 2, 2, '#F48FB1');
+      px(ctx, ox+9, oy+2, 1, 1, '#F48FB1');
+    } else if(season==='winter') {
+      px(ctx, ox+8, oy+2, 2, 2, P.white);
+      px(ctx, ox+7, oy+3, 4, 1, P.white);
+    }
+
+    // 머리카락
+    px(ctx, ox+4, oy+8, 2, 2, P.hair);
+    px(ctx, ox+10, oy+8, 2, 2, P.hair);
+    px(ctx, ox+4, oy+18, 2, 2, P.hair);
+    px(ctx, ox+10, oy+18, 2, 2, P.hair);
+  }
+
+  // ── 식물 그리기 ───────────────────────────────────────────
+  function drawPlant(ctx, ox, oy, stage, variant) {
+    // stage: 0=씨앗, 1=새싹, 2=꽃봉오리, 3=꽃, 4=나무
+    if(stage===0) {
+      // 씨앗
+      px(ctx, ox+2, oy+6, 4, 3, P.soil);
+      px(ctx, ox+3, oy+5, 2, 2, P.seed);
+      px(ctx, ox+3, oy+4, 2, 1, P.seedL||'#A0522D');
+    } else if(stage===1) {
+      // 새싹
+      px(ctx, ox+3, oy+4, 2, 5, P.plantGD);
+      px(ctx, ox+1, oy+5, 3, 2, P.plantG);
+      px(ctx, ox+4, oy+3, 3, 2, P.plantGL);
+    } else if(stage===2) {
+      // 꽃봉오리
+      px(ctx, ox+3, oy+2, 2, 7, P.plantGD);
+      px(ctx, ox+1, oy+4, 3, 2, P.plantG);
+      px(ctx, ox+4, oy+3, 3, 2, P.plantGL);
+      px(ctx, ox+3, oy+1, 2, 2, P.flower1);
+      px(ctx, ox+3, oy+0, 2, 1, P.flower2);
+    } else if(stage===3) {
+      // 꽃 (계절별)
+      px(ctx, ox+3, oy+3, 2, 6, P.plantGD);
+      px(ctx, ox+1, oy+5, 3, 2, P.plantG);
+      px(ctx, ox+4, oy+4, 3, 2, P.plantGL);
+      // 꽃잎
+      px(ctx, ox+3, oy+0, 2, 2, P.flower1);
+      px(ctx, ox+3, oy+2, 2, 1, P.flower2);
+      px(ctx, ox+1, oy+1, 2, 2, P.flower2);
+      px(ctx, ox+5, oy+1, 2, 2, P.flower1);
+      px(ctx, ox+2, oy+3, 4, 1, P.flower2);
+      // 꽃 중심
+      px(ctx, ox+3, oy+1, 2, 2, P.flowerC);
+    } else if(stage===4) {
+      // 나무
+      px(ctx, ox+3, oy+5, 2, 8, P.trunk);
+      px(ctx, ox+3, oy+5, 2, 2, P.trunkD);
+      // 잎 (삼각형)
+      px(ctx, ox+1, oy+3, 6, 3, P.leaf);
+      px(ctx, ox+0, oy+1, 8, 3, P.leaf);
+      px(ctx, ox+1, oy+0, 6, 2, P.leafL);
+      px(ctx, ox+2, oy+2, 4, 1, P.leafL);
+      if(season==='autumn') {
+        // 가을 열매
+        px(ctx, ox+1, oy+2, 1, 1, '#FF5722');
+        px(ctx, ox+6, oy+3, 1, 1, '#FF5722');
+        px(ctx, ox+3, oy+1, 1, 1, '#FF5722');
+      } else if(season==='winter') {
+        // 눈
+        px(ctx, ox+1, oy+0, 6, 1, P.white);
+        px(ctx, ox+0, oy+1, 8, 1, P.white);
+      }
+    }
+  }
+
+  // ── 밭 그리기 ─────────────────────────────────────────────
+  function drawFarmPlot(ctx, ox, oy, w, h) {
+    px(ctx, ox, oy, w, h, P.soil);
+    // 밭고랑
+    for(let i=0; i<h; i+=3) {
+      px(ctx, ox, oy+i, w, 1, P.soilD);
+    }
+    px(ctx, ox, oy, w, 1, P.soilL);
+    px(ctx, ox, oy, 1, h, P.soilL);
+  }
+
+  // ── 집 그리기 ─────────────────────────────────────────────
+  function drawHouse(ctx, ox, oy) {
+    // 굴뚝
+    px(ctx, ox+14, oy+0, 3, 6, P.chimney);
+    px(ctx, ox+14, oy+0, 3, 1, P.outline);
+    // 연기
+    ctx.fillStyle = 'rgba(176,190,197,0.5)';
+    ctx.beginPath(); ctx.arc((ox+15.5)*SCALE, (oy-3)*SCALE, 2*SCALE, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc((ox+17)*SCALE, (oy-6)*SCALE, 1.5*SCALE, 0, Math.PI*2); ctx.fill();
+    // 지붕
+    px(ctx, ox+2, oy+4, 20, 8, P.roof);
+    px(ctx, ox+2, oy+4, 20, 2, P.roofD);
+    px(ctx, ox+0, oy+10, 24, 3, P.roofD);
+    // 지붕 선
+    for(let i=0;i<20;i+=4) {
+      px(ctx, ox+2+i, oy+6, 2, 6, P.roofD);
+    }
+    // 벽
+    px(ctx, ox+1, oy+12, 22, 14, P.wall);
+    px(ctx, ox+1, oy+12, 22, 1, P.wallD);
+    // 문
+    px(ctx, ox+9, oy+18, 6, 8, P.door);
+    px(ctx, ox+9, oy+18, 6, 1, P.trunkD);
+    px(ctx, ox+11, oy+22, 1, 1, P.toolH);
+    // 창문 (좌)
+    px(ctx, ox+2, oy+15, 5, 5, P.window);
+    px(ctx, ox+2, oy+15, 5, 1, P.outline);
+    px(ctx, ox+2, oy+15, 1, 5, P.outline);
+    px(ctx, ox+4, oy+15, 1, 5, P.outline);
+    px(ctx, ox+2, oy+17, 5, 1, P.outline);
+    // 창문 (우)
+    px(ctx, ox+17, oy+15, 5, 5, P.window);
+    px(ctx, ox+17, oy+15, 5, 1, P.outline);
+    px(ctx, ox+17, oy+15, 1, 5, P.outline);
+    px(ctx, ox+19, oy+15, 1, 5, P.outline);
+    px(ctx, ox+17, oy+17, 5, 1, P.outline);
+    // 기초
+    px(ctx, ox+0, oy+25, 24, 2, P.wallD);
+  }
+
+  // ── 구름 그리기 ───────────────────────────────────────────
+  function drawCloud(ctx, ox, oy, w) {
+    const h = Math.floor(w * 0.5);
+    ctx.fillStyle = P.cloud;
+    ctx.beginPath();
+    ctx.ellipse((ox+w*0.5)*SCALE, (oy+h*0.6)*SCALE, w*0.5*SCALE, h*0.4*SCALE, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse((ox+w*0.3)*SCALE, (oy+h*0.5)*SCALE, w*0.3*SCALE, h*0.45*SCALE, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse((ox+w*0.7)*SCALE, (oy+h*0.55)*SCALE, w*0.28*SCALE, h*0.4*SCALE, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = P.cloudD;
+    ctx.beginPath();
+    ctx.ellipse((ox+w*0.5)*SCALE, (oy+h*0.7)*SCALE, w*0.4*SCALE, h*0.2*SCALE, 0, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // ── 울타리 그리기 ─────────────────────────────────────────
+  function drawFence(ctx, canvasW, oy) {
+    const totalW = Math.ceil(canvasW / SCALE);
+    for(let x=0; x<totalW; x+=8) {
+      // 기둥
+      px(ctx, x+1, oy, 2, 8, P.fence);
+      px(ctx, x+1, oy, 2, 1, P.fenceD);
+      px(ctx, x+1, oy+7, 2, 1, P.fenceD);
+    }
+    // 가로대
+    px(ctx, 0, oy+2, totalW, 2, P.fence);
+    px(ctx, 0, oy+5, totalW, 2, P.fence);
+    px(ctx, 0, oy+2, totalW, 1, P.fenceD);
+    px(ctx, 0, oy+5, totalW, 1, P.fenceD);
+  }
+
+  // ── 파티클 (계절 효과) ────────────────────────────────────
+  let particles = [];
+  function initParticles(canvasW, canvasH) {
+    const count = season==='winter'?50:season==='spring'?25:season==='autumn'?30:8;
+    particles = Array.from({length:count}, ()=>({
+      x: Math.random()*canvasW, y: Math.random()*canvasH*0.55,
+      sz: Math.random()*3+1.5,
+      vx: (Math.random()-0.5)*0.8,
+      vy: Math.random()*1.2+0.3,
+      rot: Math.random()*360,
+      vrot: (Math.random()-0.5)*4,
+      op: Math.random()*0.5+0.3,
+    }));
+  }
+
+  function drawParticles(ctx, canvasW, canvasH, dt=16.67) {
+    const speed = dt / 16.67;
+    particles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.op;
+      ctx.fillStyle = si.particleColor;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      if(season==='winter') {
+        // 눈송이
+        ctx.fillRect(-p.sz/2, -p.sz/2, p.sz, p.sz);
+      } else if(season==='spring') {
+        // 꽃잎
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.sz, p.sz*0.5, 0, 0, Math.PI*2);
+        ctx.fill();
+      } else if(season==='autumn') {
+        // 단풍잎
+        ctx.beginPath();
+        ctx.moveTo(0, -p.sz);
+        ctx.lineTo(p.sz*0.7, 0);
+        ctx.lineTo(0, p.sz);
+        ctx.lineTo(-p.sz*0.7, 0);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        // 여름 반짝이
+        ctx.beginPath();
+        ctx.arc(0, 0, p.sz*0.4, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+      p.x  += p.vx * speed;
+      p.y  += p.vy * speed;
+      p.rot += p.vrot * speed;
+      if(p.y > canvasH*0.55) { p.y = -10; p.x = Math.random()*canvasW; }
+      if(p.x > canvasW+10)   p.x = -10;
+      if(p.x < -10)          p.x = canvasW+10;
+    });
+  }
+
+  // ── 구름 상태 ─────────────────────────────────────────────
+  // iOS Safari: 스크롤 중 rAF가 계속 실행되어 구름이 빠르게 움직이는 버그 방지
+  // → 실제 경과 시간(dt)을 기반으로 속도 계산, 최대 dt 클램프
+  let clouds = [];
+  function initClouds(canvasW) {
+    const n = season==='winter'?5:4;
+    clouds = Array.from({length:n}, ()=>({
+      x: Math.random()*canvasW,
+      y: 10 + Math.random()*40,
+      w: 28 + Math.random()*32,
+      speed: 0.3 + Math.random()*0.5,
+    }));
+  }
+
+  // ── 농부 상태 ─────────────────────────────────────────────
+  let farmerX = 0;
+  let farmerTargetX = 0;
+  let farmerFrame = 0;
+  let farmerFrameTimer = 0;
+  let farmerMood = 'normal';
+  let farmerMoveTimer = 0;
+
+  function initFarmer(canvasW, tilItems) {
+    const today = now.toISOString().slice(0,10);
+    const todayN = tilItems.filter(t=>(t.date||t.created?.slice(0,10))===today).length;
+    const recent7 = tilItems.filter(t=>{ const d=new Date(t.date||t.created); return (now-d)/86400000<=7; }).length;
+    if(todayN>0)            farmerMood = 'happy';
+    else if(tilItems.length===0) farmerMood = 'normal';
+    else if(recent7===0)    farmerMood = 'sad';
+    else if(recent7>=5)     farmerMood = 'excited';
+    else                    farmerMood = 'normal';
+    farmerX = canvasW / SCALE * 0.38;
+    farmerTargetX = farmerX;
+  }
+
+  // ── 말풍선 텍스트 ─────────────────────────────────────────
+  function getBubbleText(mood) {
+    const texts = {
+      happy:   ['오늘도 열심히! 🌱', '물을 줬어요! 💧', '잘 자라고 있어요! 🌿'],
+      normal:  ['오늘도 화이팅! 🌾', '씨앗을 심어요 🌱', '좋은 날이에요! ☀️'],
+      sad:     ['...글이 그립네요 😢', '오늘은 쉬는 날? 🥺', '돌아와요... 🌧️'],
+      excited: ['이번 주 최고예요! ✨', '대단해요! 🎉', '농장이 빛나요! 🌟'],
+    };
+    const arr = texts[mood] || texts.normal;
+    return arr[Math.floor(Date.now()/5000) % arr.length];
+  }
+
+  // ── 말풍선 그리기 ─────────────────────────────────────────
+  function drawBubble(ctx, cx, cy, text) {
+    const padding = 6;
+    ctx.font = `${8}px 'Press Start 2P', monospace`;
+    const tw = ctx.measureText(text).width;
+    const bw = tw + padding*2;
+    const bh = 18;
+    const bx = cx - bw/2;
+    const by = cy - bh - 8;
+    // 배경
+    ctx.fillStyle = 'rgba(255,253,247,0.95)';
+    ctx.strokeStyle = P.outline;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, 4);
+    ctx.fill();
+    ctx.stroke();
+    // 꼬리
+    ctx.fillStyle = 'rgba(255,253,247,0.95)';
+    ctx.beginPath();
+    ctx.moveTo(cx-4, by+bh);
+    ctx.lineTo(cx+4, by+bh);
+    ctx.lineTo(cx, by+bh+6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = P.outline;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx-4, by+bh-1);
+    ctx.lineTo(cx, by+bh+6);
+    ctx.lineTo(cx+4, by+bh-1);
+    ctx.stroke();
+    // 텍스트
+    ctx.fillStyle = P.outline;
+    ctx.font = `${7}px 'Press Start 2P', monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, cx, by + bh/2);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  // ── 메인 렌더 루프 ────────────────────────────────────────
+  let animFrame;
+  let lastTime = 0;
+  let bubbleText = '';
+  let bubbleTimer = 0;
+
+  function startFarmCanvas(tilCount, tilItems) {
+    const canvas = document.getElementById('farm-canvas');
+    const scene  = document.getElementById('farm-scene');
+    const W = scene.offsetWidth || 800;
+    const H = Math.round(W * 0.38);
+    canvas.width  = W;
+    canvas.height = H;
+    canvas.style.height = H + 'px';
+
+    const CW = W;   // canvas pixel width
+    const CH = H;   // canvas pixel height
+    const GW = Math.ceil(W / SCALE);  // grid width
+    const GH = Math.ceil(H / SCALE);  // grid height
+
+    const skyH  = Math.floor(GH * 0.52);
+    const gndY  = skyH;
+    const gndH  = GH - gndY;
+    const fenceY = GH - 12;
+    const plotY  = GH - 26;
+
+    initParticles(CW, CH);
+    initClouds(CW);
+    initFarmer(CW, tilItems);
+
+    // 식물 위치 계산
+    const plantStage = tilCount===0?0:tilCount<5?1:tilCount<15?2:tilCount<30?3:4;
+    const plantCount = Math.min(5, Math.max(1, Math.ceil(tilCount/4)+1));
+    const plotW = 12;
+    const totalPlotsW = plantCount * (plotW+4);
+    const plotStartX = Math.floor(GW*0.22);
+
+    bubbleText = getBubbleText(farmerMood);
+
+    const ctx = canvas.getContext('2d');
+
+    // Canvas가 뷰포트 밖으로 나가면 애니메이션 일시정지
+    let canvasVisible = true;
+    const observer = new IntersectionObserver(entries => {
+      canvasVisible = entries[0].isIntersecting;
+    }, { threshold: 0.01 });
+    observer.observe(canvas);
+
+    // 페이지 숨김 시 일시정지
+    document.addEventListener('visibilitychange', () => {
+      if(document.hidden) lastTime = 0;
+    });
+
+    function render(time) {
+      if(!canvasVisible || document.hidden) {
+        animFrame = requestAnimationFrame(render);
+        return;
+      }
+      // dt 클램프: 탭 전환/스크롤 복귀 시 dt가 수초가 되는 현상 방지 (최대 50ms)
+      const dt = lastTime ? Math.min(time - lastTime, 50) : 16;
+      lastTime = time;
+
+      ctx.clearRect(0, 0, CW, CH);
+
+      // ── 하늘 배경 ──────────────────────────────────────────
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, skyH*SCALE);
+      skyGrad.addColorStop(0, si.skyTop);
+      skyGrad.addColorStop(1, si.skyBot);
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, CW, skyH*SCALE);
+
+      // ── 땅 ────────────────────────────────────────────────
+      const gndGrad = ctx.createLinearGradient(0, gndY*SCALE, 0, CH);
+      gndGrad.addColorStop(0, si.ground);
+      gndGrad.addColorStop(1, si.groundDark);
+      ctx.fillStyle = gndGrad;
+      ctx.fillRect(0, gndY*SCALE, CW, gndH*SCALE);
+
+      // ── 구름 (dt 기반 이동 → iOS 스크롤 버그 수정) ──────────
+      clouds.forEach(c => {
+        drawCloud(ctx, c.x/SCALE, c.y, c.w);
+        c.x += c.speed * (dt / 16.67); // 60fps 기준 정규화
+        if(c.x > CW + c.w*SCALE) c.x = -c.w*SCALE;
+      });
+
+      // ── 파티클 (dt 기반) ──────────────────────────────────
+      drawParticles(ctx, CW, CH, dt);
+
+      // ── 밭 ────────────────────────────────────────────────
+      for(let i=0; i<plantCount; i++) {
+        const px_ = plotStartX + i*(plotW+4);
+        drawFarmPlot(ctx, px_, plotY-4, plotW, 8);
+        drawPlant(ctx, px_+2, plotY-12, plantStage, i%2);
+      }
+
+      // ── 집 ────────────────────────────────────────────────
+      const houseX = Math.floor(GW*0.72);
+      const houseY = GH - 28;
+      drawHouse(ctx, houseX, houseY);
+
+      // ── 울타리 ────────────────────────────────────────────
+      drawFence(ctx, CW, fenceY);
+
+      // ── 농부 이동 (비활성화) ───────────────────────────────
+      // 캐릭터 제거로 인해 이동 로직 비활성화
+
+      // ── 말풍선 (비활성화) ────────────────────────────────────
+      // 캐릭터 제거로 인해 말풍선 비활성화
+
+      animFrame = requestAnimationFrame(render);
+    }
+
+      animFrame = requestAnimationFrame(render);
+    }
+
+    if(animFrame) cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(render);
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  통계
+  // ══════════════════════════════════════════════════════════
+  function setStats() {
+    const items = TIL.items||[];
+    const bi    = BOOKS.items||[];
+    const tags  = new Set(items.flatMap(t=>t.tags||[])).size;
+    anim('stat-til',     items.length);
+    anim('stat-books',   bi.filter(b=>b.status==='완독').length);
+    anim('stat-reading', bi.filter(b=>b.status==='읽는 중').length);
+    anim('stat-tags',    tags);
+  }
+  function anim(id, target) {
+    const el=document.getElementById(id); if(!el) return;
+    let c=0; const step=Math.max(1,Math.ceil(target/30));
+    const t=setInterval(()=>{ c=Math.min(c+step,target); el.textContent=c; if(c>=target) clearInterval(t); },40);
+  }
+  
+  // 실시간 시간 업데이트
+  setInterval(()=>{
+    const now = new Date();
+    const dateEl = document.getElementById('growth-date');
+    const timeEl = document.getElementById('growth-time');
+    if(dateEl) dateEl.textContent = now.getFullYear() + '년 ' + (now.getMonth()+1) + '월 ' + now.getDate() + '일';
+    if(timeEl) timeEl.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  }, 1000);
+
+  // ══════════════════════════════════════════════════════════
+  //  성장 바 (100개 단위 무한 성장 로직)
+  // ══════════════════════════════════════════════════════════
+  function setGrowth() {
+    const n = (TIL.items||[]).length;
+    const cycle = Math.floor(n / 100) + 1;  // 회차 계산 (0-99: 1회차, 100-199: 2회차)
+    const progress = n % 100;  // 현재 회차 내 진행도 (0-99)
+    
+    // 상단 성장 현황 업데이트
+    const cycleEl = document.getElementById('growth-cycle');
+    if(cycleEl) cycleEl.textContent = cycle + '회차';
+    
+    // 날짜/시간 업데이트
+    const now = new Date();
+    const dateEl = document.getElementById('growth-date');
+    const timeEl = document.getElementById('growth-time');
+    if(dateEl) dateEl.textContent = now.getFullYear() + '년 ' + (now.getMonth()+1) + '월 ' + now.getDate() + '일';
+    if(timeEl) timeEl.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    
+    // 성장 단계 정의
+    const defs = [
+      {min:0, max:5,   fill:'gf-main-1', si:1},
+      {min:5, max:15,  fill:'gf-main-2', si:2},
+      {min:15,max:30,  fill:'gf-main-3', si:3},
+      {min:30,max:60,  fill:'gf-main-4', si:4},
+      {min:60,max:100, fill:'gf-main-5', si:5},
+    ];
+    
+    // 메인 성장 바 업데이트
+    const stagesMain = document.querySelectorAll('#growth-stages-main .growth-stage');
+    defs.forEach((d,i)=>{
+      if(progress>=d.min) {
+        stagesMain[i+1]?.classList.add('reached');
+        const pct = progress>=d.max ? 100 : ((progress-d.min)/(d.max-d.min))*100;
+        setTimeout(()=>{ const f=document.getElementById(d.fill); if(f) f.style.width=pct+'%'; }, 400+i*120);
+      } else {
+        stagesMain[i+1]?.classList.remove('reached');
+        const f=document.getElementById(d.fill);
+        if(f) f.style.width='0%';
+      }
+    });
+    
+    // 힌트 메시지 업데이트
+    const h=document.getElementById('growth-hint-main');
+    if(h) {
+      if(progress===0)       h.textContent=`${cycle}회차 시작! TIL을 작성하면 농장이 성장해요!`;
+      else if(progress<5)    h.textContent=`🌱 새싹까지 ${5-progress}개 남았어요!`;
+      else if(progress<15)   h.textContent=`🌿 꽃봉오리까지 ${15-progress}개 남았어요!`;
+      else if(progress<30)   h.textContent=`🌸 꽃이 피기까지 ${30-progress}개 남았어요!`;
+      else if(progress<60)   h.textContent=`🌻 나무가 되기까지 ${60-progress}개 남았어요!`;
+      else if(progress<100)  h.textContent=`🌳 완전한 농장까지 ${100-progress}개 남았어요!`;
+      else                   h.textContent=`🏡 완전한 농장 완성! (${n}개 작성)`;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  활동 캘린더
+  // ══════════════════════════════════════════════════════════
+  function setCalendar() {
+    const items = TIL.items||[];
+    const dm={};
+    items.forEach(t=>{ const d=t.date||t.created?.slice(0,10); if(d) dm[d]=(dm[d]||0)+1; });
+    const grid=document.getElementById('cal-grid');
+    const months=document.getElementById('cal-months');
+    if(!grid) return;
+    const today=new Date();
+    const start=new Date(today); start.setDate(start.getDate()-364);
+    start.setDate(start.getDate()-start.getDay());
+    const todayStr=today.toISOString().slice(0,10);
+    grid.innerHTML=''; months.innerHTML='';
+    let lastM=-1, weekEl=null;
+    const cur=new Date(start);
+    while(cur<=today){
+      if(cur.getDay()===0){
+        weekEl=document.createElement('div'); weekEl.className='cal-week'; grid.appendChild(weekEl);
+        const sp=document.createElement('span'); sp.className='cal-month-lbl';
+        if(cur.getMonth()!==lastM){ lastM=cur.getMonth(); sp.textContent=(cur.getMonth()+1)+'월'; }
+        months.appendChild(sp);
+      }
+      const ds=cur.toISOString().slice(0,10);
+      const cnt=dm[ds]||0;
+      const lv=cnt===0?0:cnt===1?1:cnt===2?2:cnt<=4?3:4;
+      const day=document.createElement('div');
+      day.className=`cal-day l${lv}${ds===todayStr?' today':''}`;
+      day.title=`${ds}: TIL ${cnt}개`;
+      if(weekEl) weekEl.appendChild(day);
+      cur.setDate(cur.getDate()+1);
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  최근 TIL / 독서
+  // ══════════════════════════════════════════════════════════
+  function setTIL() {
+    const wrap=document.getElementById('til-wrap'); if(!wrap) return;
+    const items=(TIL.items||[]).slice(0,6);
+    if(!items.length) return;
+    const CE={DEV:'💻',PAPER:'📄',STACK:'🔧'};
+    wrap.innerHTML=`<div class="til-grid">${items.map(t=>`
+      <div class="til-card" onclick="location='/pages/til/?id=${esc(t.id)}'">
+        <div class="til-cat">${CE[t.category]||'📝'} ${esc(t.category||'DEV')}</div>
+        <div class="til-title">${esc(t.title)}</div>
+        <div class="til-summary">${esc(t.summary||'')}</div>
+        <div class="til-footer">
+          <span class="til-date">${t.date||''}</span>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">${(t.tags||[]).slice(0,2).map(tg=>`<span class="tag">${esc(tg)}</span>`).join('')}</div>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+
+  function setBooks() {
+    const wrap=document.getElementById('books-wrap'); if(!wrap) return;
+    const items=(BOOKS.items||[]).slice(0,4);
+    if(!items.length) return;
+    const GE={TECH:'🔬',DEV:'💻',GROWTH:'🌱',GENERAL:'📖'};
+    const SC={'완독':'#4CAF50','읽는 중':'#FF9800','위시리스트':'#9E9E9E'};
+    wrap.innerHTML=`<div class="book-mini-grid">${items.map(b=>`
+      <div class="book-mini-card" onclick="location='/pages/life-os/?id=${esc(b.id)}'">
+        <span class="book-mini-icon">${GE[b.genre]||'📖'}</span>
+        <div class="book-mini-info">
+          <div class="book-mini-title">${esc(b.title)}</div>
+          <div class="book-mini-author">${esc(b.author||'')}</div>
+          <span class="book-mini-status" style="background:${SC[b.status]||'#9E9E9E'}22;color:${SC[b.status]||'#9E9E9E'}">${b.status||''}</span>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  Floating Island 시스템
+  // ══════════════════════════════════════════════════════════
+  function drawFloatingIsland() {
+    const canvas = document.getElementById('floating-island-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const tilCount = (TIL.items || []).length;
+    
+    // 배경 그라데이션
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(135, 206, 235, 0.1)');
+    grad.addColorStop(1, 'rgba(70, 130, 180, 0.05)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    
+    // 섬 그리기
+    ctx.fillStyle = '#8B7355';
+    ctx.beginPath();
+    ctx.ellipse(w/2, h/2 + 40, 120, 60, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 섬 그림자
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.beginPath();
+    ctx.ellipse(w/2 + 5, h/2 + 50, 115, 55, 0, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 풀 (섬 위)
+    ctx.fillStyle = '#6B9D3A';
+    for (let i = 0; i < 15; i++) {
+      const x = w/2 - 100 + (i * 15);
+      const y = h/2 + 20;
+      ctx.fillRect(x, y, 3, 15);
+    }
+    
+    // TIL 개수에 따른 오브젝트 배치
+    const objects = [];
+    
+    // 0-10: 나무
+    if (tilCount >= 3) {
+      objects.push({type: 'tree', x: w/2 - 50, y: h/2 - 10});
+    }
+    // 11-20: 꽃
+    if (tilCount >= 10) {
+      objects.push({type: 'flower', x: w/2 + 40, y: h/2 - 20});
+    }
+    // 21-30: 작은 집
+    if (tilCount >= 20) {
+      objects.push({type: 'house', x: w/2, y: h/2 - 30});
+    }
+    // 31+: 랜턴
+    if (tilCount >= 30) {
+      objects.push({type: 'lantern', x: w/2 - 70, y: h/2 - 40});
+    }
+    
+    // 오브젝트 렌더링
+    objects.forEach(obj => {
+      if (obj.type === 'tree') {
+        ctx.fillStyle = '#654321';
+        ctx.fillRect(obj.x - 3, obj.y + 15, 6, 20);
+        ctx.fillStyle = '#228B22';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (obj.type === 'flower') {
+        ctx.fillStyle = '#FFB6C1';
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(obj.x + Math.cos(angle) * 5, obj.y + Math.sin(angle) * 5, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (obj.type === 'house') {
+        ctx.fillStyle = '#A0522D';
+        ctx.fillRect(obj.x - 8, obj.y, 16, 12);
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath();
+        ctx.moveTo(obj.x - 10, obj.y);
+        ctx.lineTo(obj.x, obj.y - 6);
+        ctx.lineTo(obj.x + 10, obj.y);
+        ctx.fill();
+      } else if (obj.type === 'lantern') {
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(obj.x - 3, obj.y, 6, 10);
+        ctx.fillStyle = '#FFA500';
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y - 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    
+    // TIL 개수 텍스트
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 14px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${tilCount} TILs`, w/2, h - 15);
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  동기화 태그
+  // ══════════════════════════════════════════════════════════
+  function setSyncTag() {
+    // 동기화 태그는 표시하지 않음 (노션 연동 전 더미 날짜 버그 방지)
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  초기화
+  // ══════════════════════════════════════════════════════════
+  async function init() {
+    await loadData();
+    const tilItems = TIL.items || [];
+    const tilCount = tilItems.length;
+    startFarmCanvas(tilCount, tilItems);
+    setStats();
+    drawFloatingIsland();
+    setCalendar();
+    setTIL();
+    setBooks();
+    setSyncTag();
+  }
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  window.addEventListener('scroll',()=>{
+    document.getElementById('scroll-top')?.classList.toggle('visible',window.scrollY>300);
+  });
+
+  window.addEventListener('resize', ()=>{
+    const tilItems = TIL.items||[];
+    startFarmCanvas(tilItems.length, tilItems);
+  });
+
+  init();
+  </script>
+</body>
+</html>

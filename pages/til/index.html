@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TIL — Hyunwoo Lee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── 맥주펍 테마 변수 ──────────────────────────────── */
+    :root {
+      --pub-bg:       #0D0A07;
+      --pub-bg2:      #150F09;
+      --pub-surface:  #1E1509;
+      --pub-card:     #231A0C;
+      --pub-border:   #3D2B14;
+      --pub-border2:  #5C3D1A;
+
+      --ember:        #FF6B1A;
+      --ember-glow:   #FF8C42;
+      --ember-deep:   #C84B00;
+      --gold:         #D4A017;
+      --gold-light:   #F0C040;
+      --amber:        #B8730A;
+      --cream:        #F5E6C8;
+      --cream-dim:    #C4A882;
+      --smoke:        #8B7355;
+
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-body:  'Noto Sans KR', sans-serif;
+      --radius:     6px;
+      --transition: 0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--pub-bg);
+      color: var(--cream);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── 배경 텍스처 (나무 결) ─────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        repeating-linear-gradient(
+          92deg,
+          transparent 0px, transparent 18px,
+          rgba(61,43,20,0.15) 18px, rgba(61,43,20,0.15) 19px
+        ),
+        repeating-linear-gradient(
+          180deg,
+          transparent 0px, transparent 60px,
+          rgba(92,61,26,0.08) 60px, rgba(92,61,26,0.08) 61px
+        );
+      pointer-events: none;
+    }
+
+    /* ── 모닥불 글로우 배경 ────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse at center bottom,
+        rgba(255,107,26,0.12) 0%,
+        rgba(200,75,0,0.06) 40%,
+        transparent 70%);
+      pointer-events: none; z-index: 0;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%,100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+      50%      { opacity: 1;   transform: translateX(-50%) scale(1.05); }
+    }
+
+    /* ── 네비게이션 ────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,10,7,0.92);
+      border-bottom: 1px solid var(--pub-border);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      max-width: 900px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-logo {
+      font-family: var(--font-pixel); font-size: 10px;
+      color: var(--ember-glow); text-decoration: none;
+      letter-spacing: 1px;
+    }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-pixel); font-size: 8px;
+      color: var(--cream-dim); text-decoration: none;
+      transition: color var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--ember-glow); }
+
+    /* ── 페이지 래퍼 ───────────────────────────────────── */
+    .page-wrapper {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* ── 헤더 (모닥불 씬) ──────────────────────────────── */
+    .pub-header {
+      text-align: center;
+      padding: 48px 20px 40px;
+      position: relative;
+    }
+
+    /* 모닥불 Canvas */
+    #fire-canvas {
+      display: block; margin: 0 auto 24px;
+      image-rendering: pixelated;
+    }
+
+    .pub-title {
+      font-family: var(--font-pixel); font-size: 18px;
+      color: var(--gold-light);
+      text-shadow: 0 0 20px rgba(212,160,23,0.6), 0 0 40px rgba(255,107,26,0.3);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    .pub-subtitle {
+      font-family: var(--font-pixel);
+      font-size: 8px; color: var(--cream-dim);
+      letter-spacing: 1px;
+    }
+
+    /* ── 필터 바 ───────────────────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+      padding: 16px 20px;
+      background: var(--pub-surface);
+      border: 1px solid var(--pub-border);
+      border-radius: var(--radius);
+    }
+    .filter-label {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); margin-right: 4px;
+    }
+    .filter-btn {
+      font-family: var(--font-pixel); font-size: 7px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--pub-border);
+      border-radius: 3px;
+      color: var(--cream-dim);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--ember); color: var(--ember-glow); }
+    .filter-btn.active {
+      background: var(--ember);
+      border-color: var(--ember);
+      color: var(--pub-bg);
+    }
+    .filter-sep { width: 1px; height: 20px; background: var(--pub-border); margin: 0 4px; }
+    .search-input {
+      flex: 1; min-width: 160px;
+      background: var(--pub-bg2);
+      border: 1px solid var(--pub-border);
+      border-radius: 3px;
+      padding: 7px 12px;
+      font-family: var(--font-body); font-size: 13px;
+      color: var(--cream);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .search-input::placeholder { color: var(--smoke); }
+    .search-input:focus { border-color: var(--ember); }
+
+    /* ── TIL 그리드 ────────────────────────────────────── */
+    .til-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── TIL 카드 ──────────────────────────────────────── */
+    .til-card {
+      background: var(--pub-card);
+      border: 1px solid var(--pub-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    /* 상단 불빛 라인 */
+    .til-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--ember), transparent);
+      opacity: 0; transition: opacity var(--transition);
+    }
+    /* 카드 글로우 */
+    .til-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top, rgba(255,107,26,0.04) 0%, transparent 60%);
+      opacity: 0; transition: opacity var(--transition);
+      pointer-events: none;
+    }
+    .til-card:hover {
+      border-color: var(--pub-border2);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(255,107,26,0.18), 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .til-card:hover::before { opacity: 1; }
+    .til-card:hover::after  { opacity: 1; }
+    /* 모바일 터치 피드백 */
+    .til-card:active {
+      transform: translateY(-1px) scale(0.99);
+      box-shadow: 0 4px 16px rgba(255,107,26,0.2);
+    }
+    /* 카드 등장 애니메이션 */
+    .til-card {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .til-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .til-card.visible:hover {
+      transform: translateY(-3px);
+    }
+
+    .til-card-cat {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--ember); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .til-card-cat .cat-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--ember);
+      box-shadow: 0 0 6px var(--ember);
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 6px var(--ember); }
+      50%      { opacity: 0.5; box-shadow: 0 0 2px var(--ember); }
+    }
+    .til-card-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 8px;
+      line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .til-card-summary {
+      font-size: 12px; color: var(--cream-dim);
+      line-height: 1.6;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .til-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; flex-wrap: wrap;
+    }
+    .til-card-date {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke);
+    }
+    .til-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .til-tag {
+      font-family: var(--font-pixel); font-size: 6px;
+      padding: 3px 7px;
+      background: rgba(255,107,26,0.12);
+      border: 1px solid rgba(255,107,26,0.25);
+      border-radius: 2px;
+      color: var(--ember-glow);
+    }
+
+    /* ── 빈 상태 ───────────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 80px 20px;
+      color: var(--smoke);
+    }
+    .empty-state-icon { font-size: 40px; display: block; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state-title {
+      font-family: var(--font-pixel); font-size: 10px;
+      color: var(--cream-dim); margin-bottom: 8px;
+    }
+
+    /* ── 상세 모달 ─────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--pub-card);
+      border: 1px solid var(--pub-border2);
+      border-radius: var(--radius);
+      max-width: 680px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 0 60px rgba(255,107,26,0.15), 0 20px 60px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .modal-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--pub-border);
+      position: sticky; top: 0;
+      background: var(--pub-card);
+      z-index: 10;
+    }
+    .modal-cat {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--ember); margin-bottom: 10px;
+    }
+    .modal-title {
+      font-size: 18px; font-weight: 700; color: var(--cream);
+      line-height: 1.4; margin-bottom: 10px;
+    }
+    .modal-meta {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    }
+    .modal-date { font-family: var(--font-pixel); font-size: 7px; color: var(--smoke); }
+    .modal-body {
+      padding: 24px;
+      font-size: 14px; color: var(--cream-dim);
+      line-height: 1.8;
+    }
+    .modal-body h1,.modal-body h2,.modal-body h3 {
+      color: var(--cream); margin: 20px 0 10px; font-size: 16px;
+    }
+    .modal-body h2 { font-size: 15px; }
+    .modal-body h3 { font-size: 14px; color: var(--gold-light); }
+    .modal-body code {
+      background: var(--pub-bg2); border: 1px solid var(--pub-border);
+      border-radius: 3px; padding: 2px 6px;
+      font-family: monospace; font-size: 12px; color: var(--ember-glow);
+    }
+    .modal-body pre {
+      background: var(--pub-bg2); border: 1px solid var(--pub-border);
+      border-radius: var(--radius); padding: 16px; overflow-x: auto;
+      margin: 12px 0;
+    }
+    .modal-body pre code { background: none; border: none; padding: 0; color: var(--cream-dim); }
+    .modal-body blockquote {
+      border-left: 3px solid var(--ember);
+      padding-left: 16px; margin: 12px 0;
+      color: var(--smoke); font-style: italic;
+    }
+    .modal-body a { color: var(--ember-glow); }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: 1px solid var(--pub-border);
+      border-radius: 3px; width: 32px; height: 32px;
+      color: var(--cream-dim); cursor: pointer; font-size: 16px;
+      transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { border-color: var(--ember); color: var(--ember); }
+    .modal-notion-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); text-decoration: none;
+      border: 1px solid var(--pub-border);
+      border-radius: 3px; padding: 6px 10px;
+      margin: 0 24px 24px;
+      transition: all var(--transition);
+    }
+    .modal-notion-link:hover { border-color: var(--ember); color: var(--ember-glow); }
+
+    /* ── 푸터 ──────────────────────────────────────────── */
+    .footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--pub-border);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .footer-text {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); margin-bottom: 12px;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 20px; list-style: none; }
+    .footer-links a {
+      font-family: var(--font-pixel); font-size: 7px;
+      color: var(--smoke); text-decoration: none;
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: var(--ember-glow); }
+
+    /* ── 스크롤 탑 ─────────────────────────────────────── */
+    #scroll-top {
+      position: fixed; bottom: 24px; right: 24px; z-index: 50;
+      width: 40px; height: 40px;
+      background: var(--pub-card); border: 1px solid var(--pub-border2);
+      border-radius: var(--radius); color: var(--ember-glow);
+      cursor: pointer; font-size: 16px;
+      display: none; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    #scroll-top.visible { display: flex; }
+    #scroll-top:hover { background: var(--ember); color: var(--pub-bg); border-color: var(--ember); }
+
+    /* ── 결과 카운트 ───────────────────────────────────── */
+    .result-count {
+      font-family: var(--font-pixel); font-size: 8px;
+      color: var(--smoke); margin-bottom: 20px;
+    }
+    .result-count span { color: var(--ember-glow); }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Hyunwoo Lee</a>
+      <ul class="nav-links">
+        <li><a href="/">HOME</a></li>
+        <li><a href="/pages/til/" class="active">TIL</a></li>
+        <li><a href="/pages/life-os/">BOOKS</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+
+    <!-- 헤더 모닥불 씬 -->
+    <div class="pub-header">
+      <canvas id="fire-canvas" width="200" height="120"></canvas>
+      <h1 class="pub-title">TIL</h1>
+      <p class="pub-subtitle">Today I Learned — a log of things I picked up.</p>
+    </div>
+
+    <!-- 필터 바 -->
+    <div class="filter-bar">
+      <span class="filter-label">FILTER</span>
+      <button class="filter-btn active" data-cat="ALL">ALL</button>
+      <button class="filter-btn" data-cat="DEV">DEV</button>
+      <button class="filter-btn" data-cat="PAPER">PAPER</button>
+      <button class="filter-btn" data-cat="STACK">STACK</button>
+      <div class="filter-sep"></div>
+      <input class="search-input" type="text" id="search-input" placeholder="Search...">
+    </div>
+
+    <!-- 결과 카운트 -->
+    <div class="result-count" id="result-count"></div>
+
+    <!-- TIL 목록 -->
+    <div id="til-container">
+      <div class="empty-state">
+        <span class="empty-state-icon">🔥</span>
+        <div class="empty-state-title">No posts yet.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 상세 모달 -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-cat" id="modal-cat"></div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-meta">
+          <span class="modal-date" id="modal-date"></span>
+          <div id="modal-tags" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <a class="modal-notion-link" id="modal-notion-link" href="#" target="_blank">📝 View in Notion →</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-text">Hyunwoo Lee · Powered by Notion &amp; GitHub Pages</div>
+    <ul class="footer-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/pages/til/">TIL</a></li>
+      <li><a href="/pages/life-os/">Books</a></li>
+      <li><a href="https://github.com/hyunNus/hyunNus.github.io" target="_blank">GitHub</a></li>
+    </ul>
+  </footer>
+
+  <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <script>
+  // ══════════════════════════════════════════════════════════
+  //  모닥불 Canvas 애니메이션 (스크롤 연동 강화)
+  // ══════════════════════════════════════════════════════════
+  (function() {
+    const canvas = document.getElementById('fire-canvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const SCALE = 2;
+    const GW = Math.ceil(W/SCALE), GH = Math.ceil(H/SCALE);
+
+    // 스크롤 강도 추적 (스크롤할수록 불꽃이 커짐)
+    let scrollIntensity = 1.0;
+    let lastScrollY = 0;
+    let scrollVelocity = 0;
+    window.addEventListener('scroll', () => {
+      const dy = Math.abs(window.scrollY - lastScrollY);
+      scrollVelocity = Math.min(dy * 0.08, 2.5);
+      lastScrollY = window.scrollY;
+    }, { passive: true });
+
+    function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x*SCALE,y*SCALE,w*SCALE,h*SCALE); }
+
+    // 통나무
+    function drawLog() {
+      const lx = GW/2-12, ly = GH-10;
+      px(lx,    ly,   24, 5, '#4E342E');
+      px(lx,    ly,   24, 1, '#6D4C41');
+      px(lx+2,  ly+1, 20, 1, '#795548');
+      px(lx+6,  ly,    2, 5, '#3E2723');
+      px(lx+16, ly,    2, 5, '#3E2723');
+      // 두번째 통나무 (X자)
+      px(lx+2,  ly+2, 20, 5, '#5D4037');
+      px(lx+2,  ly+2, 20, 1, '#795548');
+    }
+
+    // 불씨 파티클
+    const embers = Array.from({length:30}, ()=>newEmber());
+    function newEmber() {
+      return {
+        x: (GW/2 - 6) + Math.random()*12,
+        y: GH - 14,
+        vx: (Math.random()-0.5)*1.2,
+        vy: -(Math.random()*2.5+1.5),
+        life: Math.random()*0.6+0.4,
+        maxLife: Math.random()*0.6+0.4,
+        sz: Math.random()*2+1,
+      };
+    }
+
+    // 불꽃 파티클
+    const flames = Array.from({length:20}, ()=>newFlame());
+    function newFlame() {
+      return {
+        x: (GW/2 - 8) + Math.random()*16,
+        y: GH - 14,
+        vx: (Math.random()-0.5)*0.8,
+        vy: -(Math.random()*3+2),
+        life: 1.0,
+        maxLife: Math.random()*0.4+0.3,
+        sz: Math.random()*4+2,
+        hue: Math.random()*30, // 0=빨강, 30=주황
+      };
+    }
+
+    function fireColor(hue, alpha) {
+      const r = 255;
+      const g = Math.floor(hue * 5);
+      const b = 0;
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    let lastT = 0;
+    let canvasVisible = true;
+    const obs = new IntersectionObserver(e => { canvasVisible = e[0].isIntersecting; }, {threshold:0.01});
+    obs.observe(canvas);
+    document.addEventListener('visibilitychange', () => { if(document.hidden) lastT = 0; });
+
+    function draw(t) {
+      if(!canvasVisible || document.hidden) { requestAnimationFrame(draw); return; }
+      const dt = lastT ? Math.min((t - lastT) / 16.67, 3) : 1;
+      lastT = t;
+
+      // 스크롤 강도 감쇠
+      scrollIntensity = 1.0 + scrollVelocity;
+      scrollVelocity *= 0.88;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // 바닥 글로우 (스크롤 강도에 따라 확장)
+      const glowR = 60 + scrollVelocity * 20;
+      const grd = ctx.createRadialGradient(W/2, H-10, 0, W/2, H-10, glowR);
+      grd.addColorStop(0, `rgba(255,107,26,${0.35 + scrollVelocity * 0.1})`);
+      grd.addColorStop(0.5, 'rgba(200,75,0,0.12)');
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      // 불꽃 (스크롤 강도에 따라 더 크고 빠르게)
+      flames.forEach(f => {
+        f.x += f.vx * dt * scrollIntensity;
+        f.y += f.vy * dt * scrollIntensity;
+        f.life -= dt / (f.maxLife * 60);
+        if(f.life <= 0) Object.assign(f, newFlame());
+        const alpha = Math.max(0, f.life) * 0.9;
+        const sz = f.sz * f.life * SCALE * scrollIntensity;
+        if(sz < 1) return;
+        const gf = ctx.createRadialGradient(f.x*SCALE, f.y*SCALE, 0, f.x*SCALE, f.y*SCALE, sz);
+        gf.addColorStop(0, fireColor(f.hue+20, alpha));
+        gf.addColorStop(0.4, fireColor(f.hue, alpha*0.7));
+        gf.addColorStop(1, 'transparent');
+        ctx.fillStyle = gf;
+        ctx.beginPath();
+        ctx.arc(f.x*SCALE, f.y*SCALE, sz, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // 불씨 (스크롤 시 더 많이 튀어오름)
+      embers.forEach(e => {
+        e.x += e.vx * dt * (1 + scrollVelocity * 0.3);
+        e.y += e.vy * dt * scrollIntensity;
+        e.vy += 0.04 * dt;
+        e.life -= dt * 0.015;
+        if(e.life <= 0) Object.assign(e, newEmber());
+        const alpha = Math.max(0, e.life) * 0.9;
+        ctx.fillStyle = `rgba(255,${Math.floor(150+e.life*100)},50,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(e.x*SCALE, e.y*SCALE, e.sz, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // 통나무
+      drawLog();
+
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  //  카드 등장 IntersectionObserver
+  // ══════════════════════════════════════════════════════════
+  function observeCards() {
+    const cardObs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if(entry.isIntersecting) {
+          // 순서대로 딜레이를 주어 cascade 효과
+          const idx = Array.from(document.querySelectorAll('.til-card')).indexOf(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, (idx % 6) * 60);
+          cardObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.til-card').forEach(card => {
+      cardObs.observe(card);
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  데이터 로드 및 렌더
+  // ══════════════════════════════════════════════════════════
+  let ALL_ITEMS = [];
+  let currentCat = 'ALL';
+  let currentSearch = '';
+
+  async function loadData() {
+    try {
+      const data = await fetch('/data/til.json').then(r=>r.json());
+      ALL_ITEMS = data.items || [];
+    } catch(e) { ALL_ITEMS = []; }
+    render();
+    checkURLParam();
+  }
+
+  function render() {
+    const items = ALL_ITEMS.filter(t => {
+      const catOk = currentCat==='ALL' || t.category===currentCat;
+      const q = currentSearch.toLowerCase();
+      const searchOk = !q ||
+        (t.title||'').toLowerCase().includes(q) ||
+        (t.summary||'').toLowerCase().includes(q) ||
+        (t.tags||[]).some(tg=>tg.toLowerCase().includes(q));
+      return catOk && searchOk;
+    });
+
+    const cnt = document.getElementById('result-count');
+    if(cnt) cnt.innerHTML = `<span>${items.length}</span> post${items.length!==1?'s':''} found`;
+    const container = document.getElementById('til-container');
+    if(!items.length) {
+      container.innerHTML = `<div class="empty-state">
+        <span class="empty-state-icon">🔥</span>
+        <div class="empty-state-title">No posts yet.</div>
+      </div>`;
+      return;
+    }
+
+    const CE = {DEV:'// DEV', PAPER:'§ PAPER', STACK:'⚙ STACK'};
+    container.innerHTML = `<div class="til-grid">${items.map(t=>`
+      <div class="til-card" onclick="openModal('${esc(t.id)}'); spawnFireClick(event)">
+        <div class="til-card-cat"><span class="cat-dot"></span>${CE[t.category]||t.category||'TIL'}</div>
+        <div class="til-card-title">${esc(t.title)}</div>
+        <div class="til-card-summary">${esc(t.summary||'')}</div>
+        <div class="til-card-footer">
+          <span class="til-card-date">${t.date||''}</span>
+          <div class="til-tags">${(t.tags||[]).slice(0,3).map(tg=>`<span class="til-tag">${esc(tg)}</span>`).join('')}</div>
+        </div>
+      </div>`).join('')}</div>`;
+    // 카드 렌더 후 등장 애니메이션 적용
+    requestAnimationFrame(() => observeCards());
+  }
+
+  // ── 필터 이벤트 ─────────────────────────────────────────
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      render();
+    });
+  });
+
+  document.getElementById('search-input').addEventListener('input', e => {
+    currentSearch = e.target.value;
+    render();
+  });
+
+  // ── 모달 ────────────────────────────────────────────────
+  function openModal(id) {
+    const t = ALL_ITEMS.find(x=>x.id===id); if(!t) return;
+    const CE = {DEV:'// DEV', PAPER:'§ PAPER', STACK:'⚙ STACK'};
+    document.getElementById('modal-cat').textContent   = CE[t.category]||t.category||'TIL';
+    document.getElementById('modal-title').textContent = t.title||'';
+    document.getElementById('modal-date').textContent  = t.date||'';
+    document.getElementById('modal-tags').innerHTML    = (t.tags||[]).map(tg=>`<span class="til-tag">${esc(tg)}</span>`).join('');
+    document.getElementById('modal-body').innerHTML    = renderMd(t.content||t.summary||'No content.');
+    const nl = document.getElementById('modal-notion-link');
+    if(t.url) { nl.href=t.url; nl.style.display='inline-flex'; }
+    else nl.style.display='none';
+    document.getElementById('modal-overlay').classList.add('open');
+    history.replaceState(null,'',`?id=${id}`);
+  }
+
+  function closeModal(e) {
+    if(e.target===document.getElementById('modal-overlay')) {
+      document.getElementById('modal-overlay').classList.remove('open');
+      history.replaceState(null,'',location.pathname);
+    }
+  }
+
+  function checkURLParam() {
+    const id = new URLSearchParams(location.search).get('id');
+    if(id) openModal(id);
+  }
+
+  // ── 마크다운 렌더 ────────────────────────────────────────
+  function renderMd(md) {
+    return md
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/```(\w*)\n?([\s\S]*?)```/g, (_,l,c)=>`<pre><code class="lang-${l}">${c.trim()}</code></pre>`)
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm,  '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm,   '<h1>$1</h1>')
+      .replace(/^\> (.+)$/gm,  '<blockquote>$1</blockquote>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,    '<em>$1</em>')
+      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^(?!<[hupbl])(.+)$/gm, '<p>$1</p>')
+      .replace(/<p><\/p>/g, '');
+  }
+
+  // ── 카드 클릭 시 불꽃 파티클 이펙트 ────────────────────
+  function spawnFireClick(e) {
+    const x = e.clientX, y = e.clientY;
+    const count = 12;
+    for(let i = 0; i < count; i++) {
+      const spark = document.createElement('div');
+      const angle = (i / count) * Math.PI * 2;
+      const dist = 30 + Math.random() * 40;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist - 20;
+      spark.style.cssText = `
+        position:fixed; left:${x}px; top:${y}px;
+        width:${4 + Math.random()*4}px; height:${4 + Math.random()*4}px;
+        border-radius:50%;
+        background:${Math.random()>0.5?'#FF6B1A':'#FFD700'};
+        box-shadow:0 0 6px #FF6B1A;
+        pointer-events:none; z-index:9999;
+        transform:translate(-50%,-50%);
+        animation:sparkFly 0.6s ease-out forwards;
+        --dx:${dx}px; --dy:${dy}px;
+      `;
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 650);
+    }
+  }
+
+  // sparkFly 키프레임 동적 추가
+  if(!document.getElementById('spark-style')) {
+    const s = document.createElement('style');
+    s.id = 'spark-style';
+    s.textContent = `
+      @keyframes sparkFly {
+        0%   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+        100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  window.addEventListener('scroll',()=>{
+    document.getElementById('scroll-top')?.classList.toggle('visible',window.scrollY>300);
+  }, { passive: true });
+
+  loadData();
+  </script>
+</body>
+</html>
