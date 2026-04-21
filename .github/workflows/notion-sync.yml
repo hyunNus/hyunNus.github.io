@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -33,10 +35,10 @@ jobs:
           NOTION_TIL_DB_ID: ${{ secrets.NOTION_TIL_DB_ID }}
           NOTION_BOOKS_DB_ID: ${{ secrets.NOTION_BOOKS_DB_ID }}
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          personal_token: ${{ secrets.GH_PAT }}
-          publish_dir: './'
-          force_orphan: true
-          exclude_assets: 'scripts/node_modules'
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/*.json
+          git commit -m "Update Notion data [skip ci]" || echo "No changes to commit"
+          git push origin main
