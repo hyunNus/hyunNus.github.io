@@ -1,0 +1,39 @@
+name: Notion Sync & Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/fetch-notion.js'
+
+jobs:
+  sync-notion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Fetch Notion data
+        run: node scripts/fetch-notion.js
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_TIL_DATABASE_ID: ${{ secrets.NOTION_TIL_DATABASE_ID }}
+          NOTION_BOOKS_DATABASE_ID: ${{ secrets.NOTION_BOOKS_DATABASE_ID }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: './'
+          force_orphan: true
