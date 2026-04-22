@@ -8,8 +8,13 @@ on:
     paths:
       - 'scripts/fetch-notion.js'
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  sync-notion:
+  sync-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,10 +40,26 @@ jobs:
           NOTION_TIL_DB_ID: ${{ secrets.NOTION_TIL_DB_ID }}
           NOTION_BOOKS_DB_ID: ${{ secrets.NOTION_BOOKS_DB_ID }}
 
-      - name: Commit and Push changes
+      - name: Commit and Push data changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/*.json
-          git commit -m "Update Notion data [skip ci]" || echo "No changes to commit"
-          git push origin main
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Notion data [skip ci]"
+            git push origin main
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
