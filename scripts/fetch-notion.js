@@ -1,11 +1,6 @@
 /**
  * fetch-notion.js
  * Notion API에서 TIL/Books 데이터를 가져와 /data/*.json으로 저장
- * 
- * 환경변수:
- *   NOTION_TOKEN       - Notion Integration Token
- *   NOTION_TIL_DB_ID   - TIL 데이터베이스 ID
- *   NOTION_BOOKS_DB_ID - Books 데이터베이스 ID
  */
 
 import { Client } from '@notionhq/client';
@@ -16,7 +11,6 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, '..', 'data');
 
-// 데이터 디렉토리 생성
 mkdirSync(DATA_DIR, { recursive: true });
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
@@ -24,7 +18,6 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const TIL_DB_ID   = process.env.NOTION_TIL_DB_ID;
 const BOOKS_DB_ID = process.env.NOTION_BOOKS_DB_ID;
 
-// ─── 헬퍼 함수 ───────────────────────────────────────────────
 function getRichText(prop) {
   if (!prop || !prop.rich_text) return '';
   return prop.rich_text.map(t => t.plain_text).join('');
@@ -55,12 +48,19 @@ function getNumber(prop) {
   return prop.number;
 }
 
-function getCheckbox(prop) {
-  if (!prop) return false;
-  return prop.checkbox === true;
+function richTextToMarkdown(richTextArray) {
+  if (!richTextArray) return '';
+  return richTextArray.map(t => {
+    let text = t.plain_text;
+    if (t.annotations.bold) text = `**${text}**`;
+    if (t.annotations.italic) text = `*${text}*`;
+    if (t.annotations.strikethrough) text = `~~${text}~~`;
+    if (t.annotations.code) text = `\`${text}\``;
+    if (t.href) text = `[${text}](${t.href})`;
+    return text;
+  }).join('');
 }
 
-// 노션 페이지 블록 → 마크다운 변환 (간단 버전)
 async function pageToMarkdown(pageId) {
   try {
     const blocks = await notion.blocks.children.list({ block_id: pageId, page_size: 100 });
@@ -68,22 +68,22 @@ async function pageToMarkdown(pageId) {
     for (const block of blocks.results) {
       switch (block.type) {
         case 'paragraph':
-          md += block.paragraph.rich_text.map(t => t.plain_text).join('') + '\n\n';
+          md += richTextToMarkdown(block.paragraph.rich_text) + '\n\n';
           break;
         case 'heading_1':
-          md += '# ' + block.heading_1.rich_text.map(t => t.plain_text).join('') + '\n\n';
+          md += '# ' + richTextToMarkdown(block.heading_1.rich_text) + '\n\n';
           break;
         case 'heading_2':
-          md += '## ' + block.heading_2.rich_text.map(t => t.plain_text).join('') + '\n\n';
+          md += '## ' + richTextToMarkdown(block.heading_2.rich_text) + '\n\n';
           break;
         case 'heading_3':
-          md += '### ' + block.heading_3.rich_text.map(t => t.plain_text).join('') + '\n\n';
+          md += '### ' + richTextToMarkdown(block.heading_3.rich_text) + '\n\n';
           break;
         case 'bulleted_list_item':
-          md += '- ' + block.bulleted_list_item.rich_text.map(t => t.plain_text).join('') + '\n';
+          md += '- ' + richTextToMarkdown(block.bulleted_list_item.rich_text) + '\n';
           break;
         case 'numbered_list_item':
-          md += '1. ' + block.numbered_list_item.rich_text.map(t => t.plain_text).join('') + '\n';
+          md += '1. ' + richTextToMarkdown(block.numbered_list_item.rich_text) + '\n';
           break;
         case 'code':
           const lang = block.code.language || '';
@@ -91,12 +91,32 @@ async function pageToMarkdown(pageId) {
           md += '```' + lang + '\n' + code + '\n```\n\n';
           break;
         case 'quote':
-          md += '> ' + block.quote.rich_text.map(t => t.plain_text).join('') + '\n\n';
+          md += '> ' + richTextToMarkdown(block.quote.rich_text) + '\n\n';
           break;
         case 'divider':
           md += '---\n\n';
           break;
-        default:
+        case 'bookmark':
+          const url = block.bookmark.url;
+          const caption = richTextToMarkdown(block.bookmark.caption);
+          md += `\n> 🔗 **Bookmark**: [${caption || url}](${url})\n\n`;
+          break;
+        case 'link_preview':
+          md += `\n> 🔗 **Link**: [${block.link_preview.url}](${block.link_preview.url})\n\n`;
+          break;
+        case 'image':
+          const imgUrl = block.image.type === 'external' ? block.image.external.url : block.image.file.url;
+          const imgCaption = richTextToMarkdown(block.image.caption);
+          md += `![${imgCaption || 'image'}](${imgUrl})\n\n`;
+          break;
+        case 'callout':
+          const icon = block.callout.icon?.emoji || '💡';
+          const calloutText = richTextToMarkdown(block.callout.rich_text);
+          md += `\n> ${icon} ${calloutText}\n\n`;
+          break;
+        case 'to_do':
+          const checked = block.to_do.checked ? '[x]' : '[ ]';
+          md += `${checked} ${richTextToMarkdown(block.to_do.rich_text)}\n`;
           break;
       }
     }
@@ -106,24 +126,16 @@ async function pageToMarkdown(pageId) {
   }
 }
 
-// ─── TIL 데이터 fetch ─────────────────────────────────────────
 async function fetchTIL() {
-  console.log('📚 TIL 데이터 가져오는 중...');
-  
   const response = await notion.databases.query({
     database_id: TIL_DB_ID,
-    filter: {
-      property: 'Published',
-      checkbox: { equals: true }
-    },
+    filter: { property: 'Published', checkbox: { equals: true } },
     sorts: [{ property: 'Date', direction: 'descending' }]
   });
-
   const items = [];
   for (const page of response.results) {
     const p = page.properties;
     const content = await pageToMarkdown(page.id);
-    
     items.push({
       id: page.id,
       title: getTitle(p['Name']),
@@ -137,35 +149,19 @@ async function fetchTIL() {
       updated: page.last_edited_time
     });
   }
-
-  const output = {
-    lastSync: new Date().toISOString(),
-    count: items.length,
-    items
-  };
-
-  writeFileSync(join(DATA_DIR, 'til.json'), JSON.stringify(output, null, 2));
-  console.log(`✅ TIL ${items.length}개 저장 완료`);
+  writeFileSync(join(DATA_DIR, 'til.json'), JSON.stringify({ lastSync: new Date().toISOString(), count: items.length, items }, null, 2));
   return items.length;
 }
 
-// ─── Books 데이터 fetch ───────────────────────────────────────
 async function fetchBooks() {
-  console.log('📖 Books 데이터 가져오는 중...');
-  
   const response = await notion.databases.query({
     database_id: BOOKS_DB_ID,
-    filter: {
-      property: 'Published',
-      checkbox: { equals: true }
-    },
+    filter: { property: 'Published', checkbox: { equals: true } },
     sorts: [{ property: 'Status', direction: 'ascending' }]
   });
-
   const items = [];
   for (const page of response.results) {
     const p = page.properties;
-    
     items.push({
       id: page.id,
       title: getTitle(p['Name']),
@@ -180,51 +176,18 @@ async function fetchBooks() {
       updated: page.last_edited_time
     });
   }
-
-  const output = {
-    lastSync: new Date().toISOString(),
-    count: items.length,
-    items
-  };
-
-  writeFileSync(join(DATA_DIR, 'books.json'), JSON.stringify(output, null, 2));
-  console.log(`✅ Books ${items.length}개 저장 완료`);
+  writeFileSync(join(DATA_DIR, 'books.json'), JSON.stringify({ lastSync: new Date().toISOString(), count: items.length, items }, null, 2));
   return items.length;
 }
 
-// ─── 메타 데이터 저장 ─────────────────────────────────────────
-function saveMetadata(tilCount, booksCount) {
-  const meta = {
-    lastSync: new Date().toISOString(),
-    tilCount,
-    booksCount
-  };
-  writeFileSync(join(DATA_DIR, 'meta.json'), JSON.stringify(meta, null, 2));
-}
-
-// ─── 메인 실행 ────────────────────────────────────────────────
 async function main() {
-  console.log('🌾 SRE Notion Sync 시작...\n');
-  
-  if (!process.env.NOTION_TOKEN) {
-    console.error('❌ NOTION_TOKEN 환경변수가 설정되지 않았습니다.');
-    process.exit(1);
-  }
-
+  if (!process.env.NOTION_TOKEN) process.exit(1);
   try {
-    const tilCount   = TIL_DB_ID   ? await fetchTIL()   : 0;
+    const tilCount = TIL_DB_ID ? await fetchTIL() : 0;
     const booksCount = BOOKS_DB_ID ? await fetchBooks() : 0;
-    saveMetadata(tilCount, booksCount);
-    console.log('\n🎉 동기화 완료!');
+    writeFileSync(join(DATA_DIR, 'meta.json'), JSON.stringify({ lastSync: new Date().toISOString(), tilCount, booksCount }, null, 2));
   } catch (error) {
-    console.error('❌ 동기화 실패:', error.message);
-    // 빈 데이터 파일 생성 (사이트가 깨지지 않도록)
-    const empty = { lastSync: new Date().toISOString(), count: 0, items: [] };
-    writeFileSync(join(DATA_DIR, 'til.json'),   JSON.stringify(empty, null, 2));
-    writeFileSync(join(DATA_DIR, 'books.json'), JSON.stringify(empty, null, 2));
-    saveMetadata(0, 0);
     process.exit(1);
   }
 }
-
 main();
