@@ -1,7 +1,37 @@
 {
-  "lastSync": "2026-04-26T07:13:29.454Z",
-  "count": 4,
+  "lastSync": "2026-04-26T09:41:07.527Z",
+  "count": 6,
   "items": [
+    {
+      "id": "34ecd529-c13d-80e9-8e69-f197d98703d2",
+      "title": "D-5",
+      "category": "PAPER",
+      "tags": [
+        "RAG"
+      ],
+      "date": "2026-04-24",
+      "summary": "My first task😁😋",
+      "content": "## Excel Rag Pipeline Research \n\n---\n\n- Llama parse\n- Qdrant \n- Table rag \n- Advance rag \n- SQL, Pandas\n- Auto retrieval\n```plain text\n  [ Ingestion Flow (데이터 적재) ]\n  ┌────────────┐    ┌──────────────────────────┐    ┌──────────────────────┐    ┌─────────────────────┐\n  │ Excel File ├───►│ LlamaParse (Extraction)  ├───►│ Node Parsing & Embed ├───►│ Qdrant (Vector DB)  │\n  └────────────┘    │ - text: Markdown Table   │    │ - Markdown Chunking  │    │ - Vector: MD Text   │\n                    │ - metadata: {\"sheet\",..} │    │ - Embedding Model    │    │ - Payload: Metadata │\n                    └──────────────────────────┘    └──────────────────────┘    └──────────┬──────────┘\n                                                                                           │\n  [ Retrieval Flow (검색 및 생성) ]                                                        │\n  ┌────────────┐    ┌──────────────────────────┐    ┌──────────────────────┐               │\n  │ User Query ├───►│ Auto-Retriever (LLM)     ├───►│ Qdrant Pre-Filtering │◄──────────────┘\n  └────────────┘    │ - VectorStoreInfo 참조   │    │ - Metadata Match     │\n                    │ - JSON Filter 조건 추출  │    │ - Vector Similarity  │\n                    └──────────────────────────┘    └──────────┬───────────┘\n                                                               │ (Top-K MD Chunks)\n                                                    ┌──────────▼───────────┐    ┌─────────────────────┐\n                                                    │ LLM Generator        ├───►│ Final Answer        │\n                                                    └──────────────────────┘    └─────────────────────┘\n\n```",
+      "url": "https://www.notion.so/D-5-34ecd529c13d80e98e69f197d98703d2",
+      "created": "2026-04-26T09:18:00.000Z",
+      "updated": "2026-04-26T09:22:00.000Z"
+    },
+    {
+      "id": "34dcd529-c13d-80d9-9ee8-eb01908faecc",
+      "title": "D-4",
+      "category": "DEV",
+      "tags": [
+        "Data",
+        "CI/CD",
+        "Python"
+      ],
+      "date": "2026-04-23",
+      "summary": "4일차 정리",
+      "content": "- Gitlab 가입\n- 홈페이지 및 개발위키 가입\n- 채팅 및 프로젝트 관리 프로그램 가입\n- 커밋 메세지 규칙 및 서버 사용법 학습\n- 도커 기본 명령어 학습 \n- 부서의 전체적인 업무 파악\n---\n\n팀장님 미팅 준비 \n\n- Auto rag 평가 아키텍처 공부\n- Copali, visrag, vidorag 공부 \n\n> 🔗 **Bookmark**: [https://www.youtube.com/live/hh2Bx6DYgpw?si=Iz-oR94MCIk4-Ovk](https://www.youtube.com/live/hh2Bx6DYgpw?si=Iz-oR94MCIk4-Ovk)",
+      "url": "https://www.notion.so/D-4-34dcd529c13d80d99ee8eb01908faecc",
+      "created": "2026-04-25T12:36:00.000Z",
+      "updated": "2026-04-26T09:36:00.000Z"
+    },
     {
       "id": "34acd529-c13d-8013-b8b8-dc3b2f93c06b",
       "title": "Docker “top”",
