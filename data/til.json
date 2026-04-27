@@ -1,7 +1,23 @@
 {
-  "lastSync": "2026-04-27T10:51:14.649Z",
-  "count": 6,
+  "lastSync": "2026-04-27T13:10:57.296Z",
+  "count": 7,
   "items": [
+    {
+      "id": "34fcd529-c13d-8066-a263-c1018eaecc24",
+      "title": "D-6 ",
+      "category": "DEV",
+      "tags": [
+        "RAG",
+        "LLM",
+        "Python"
+      ],
+      "date": "2026-04-27",
+      "summary": "해내야만 한다",
+      "content": "- Plane 가입 \n- Rag pipeline/Architecture review\n- Code review\n- DB workflow checking\n- 기존 pipeline에 잘 녹아들어갈 수 있는 excel rag pipeline 구체화 \n1. Table like method\n1. Table + Image processing like\n---\n\n## New Task😲\n\n- VLM evaluation \n- Data crawling",
+      "url": "https://www.notion.so/D-6-34fcd529c13d8066a263c1018eaecc24",
+      "created": "2026-04-27T10:53:00.000Z",
+      "updated": "2026-04-27T10:59:00.000Z"
+    },
     {
       "id": "34ecd529-c13d-80e9-8e69-f197d98703d2",
       "title": "D-5",
