@@ -1,7 +1,23 @@
 {
-  "lastSync": "2026-04-28T07:59:40.880Z",
-  "count": 7,
+  "lastSync": "2026-04-28T10:51:33.320Z",
+  "count": 8,
   "items": [
+    {
+      "id": "350cd529-c13d-80cd-89e7-fd9676dfc174",
+      "title": "D-7",
+      "category": "Experience",
+      "tags": [
+        "Python",
+        "RAG",
+        "Data"
+      ],
+      "date": "2026-04-28",
+      "summary": "살려줘",
+      "content": "- Rag architecture final review \n- Excel rag architecture → done\n- Data pipeline and processing code review\n- Vlm evaluation code refactoring\n- Dev env setting → wsl + docker + vscode\n---\n\n## Problem\n\n- Why not python 3.12 !? , I’m 3.11\n- Team header meeting is tomorrow.",
+      "url": "https://www.notion.so/D-7-350cd529c13d80cd89e7fd9676dfc174",
+      "created": "2026-04-28T09:00:00.000Z",
+      "updated": "2026-04-28T09:04:00.000Z"
+    },
     {
       "id": "34fcd529-c13d-8066-a263-c1018eaecc24",
       "title": "D-6 ",
