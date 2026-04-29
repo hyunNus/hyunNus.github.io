@@ -1,7 +1,21 @@
 {
-  "lastSync": "2026-04-29T07:54:17.631Z",
-  "count": 8,
+  "lastSync": "2026-04-29T10:44:50.170Z",
+  "count": 9,
   "items": [
+    {
+      "id": "351cd529-c13d-8078-8594-e4d65f6806d2",
+      "title": "D-8",
+      "category": "Experience",
+      "tags": [
+        "LLM"
+      ],
+      "date": "2026-04-29",
+      "summary": "준비 끝",
+      "content": "- 행정 업무 배우기 \n- Wsl - ubuntu - docker -vscode\n- Docker basic command\n- Volume \n- Vlm Code review / refactoring\n- Vlm eval meeting \n---\n\nProblem \n\n- What’s wrong with my library :(\n- openai / pymupdf → im gonna fix it🤓",
+      "url": "https://app.notion.com/p/D-8-351cd529c13d80788594e4d65f6806d2",
+      "created": "2026-04-29T09:33:00.000Z",
+      "updated": "2026-04-29T09:39:00.000Z"
+    },
     {
       "id": "350cd529-c13d-80cd-89e7-fd9676dfc174",
       "title": "D-7",
