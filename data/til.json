@@ -1,7 +1,21 @@
 {
-  "lastSync": "2026-05-08T10:13:15.468Z",
-  "count": 12,
+  "lastSync": "2026-05-08T13:02:35.392Z",
+  "count": 13,
   "items": [
+    {
+      "id": "35acd529-c13d-80f2-8296-d3ef8b8e29dc",
+      "title": "D-12",
+      "category": "DEV",
+      "tags": [
+        "LLM"
+      ],
+      "date": "2026-05-08",
+      "summary": "찐빠데이",
+      "content": "- 데이터 수집 \n- Qwen model based code refactoring / feature develop\n- 명단 찐빠 → 선임 + 주임원사님 덕분에 해결\n- 본체 포맷 → 와리가리 \n- 전화 많이 받",
+      "url": "https://www.notion.so/D-12-35acd529c13d80f28296d3ef8b8e29dc",
+      "created": "2026-05-08T12:21:00.000Z",
+      "updated": "2026-05-08T12:23:00.000Z"
+    },
     {
       "id": "359cd529-c13d-80d2-a528-f73ee17af534",
       "title": "D-11",
