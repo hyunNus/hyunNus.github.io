@@ -1,7 +1,49 @@
 {
-  "lastSync": "2026-05-20T06:36:27.765Z",
-  "count": 13,
+  "lastSync": "2026-05-20T11:39:31.541Z",
+  "count": 16,
   "items": [
+    {
+      "id": "366cd529-c13d-8082-be46-ff4bf4596aa2",
+      "title": "D-15",
+      "category": "DEV",
+      "tags": [
+        "LLM"
+      ],
+      "date": "2026-05-20",
+      "summary": "휴가 끝🙉",
+      "content": "- 미팅 및 회의 반응 good\n- Good feedback \n- Issue and changes got it \n- Model integrated version via config.yaml → refactoring\n- 국방 ai 아이디어 대회 \n- Cns 수학 최적화 대회",
+      "url": "https://www.notion.so/D-15-366cd529c13d8082be46ff4bf4596aa2",
+      "created": "2026-05-20T10:15:00.000Z",
+      "updated": "2026-05-20T10:17:00.000Z"
+    },
+    {
+      "id": "366cd529-c13d-805e-83d5-fca30b53fb5a",
+      "title": "D-14",
+      "category": "DEV",
+      "tags": [
+        "LLM"
+      ],
+      "date": "2026-05-13",
+      "summary": "첫 야근",
+      "content": "- 모델 통합 테스트 리팩토링\n- 보고자료 제작(프롬프트 엔지니어링)\n- Test 완료 및 쌍 데이터 보고 \n- Json to md 변환 로직 \n-",
+      "url": "https://www.notion.so/D-14-366cd529c13d805e83d5fca30b53fb5a",
+      "created": "2026-05-20T09:34:00.000Z",
+      "updated": "2026-05-20T10:15:00.000Z"
+    },
+    {
+      "id": "35ecd529-c13d-80cd-8aa3-f53ce03e79c5",
+      "title": "D-13",
+      "category": "DEV",
+      "tags": [
+        "LLM"
+      ],
+      "date": "2026-05-12",
+      "summary": "얼마나 잘될려고😁",
+      "content": "- Vlm 프롬프트 엔지니어링 \n- 파이프라인 구체화",
+      "url": "https://www.notion.so/D-13-35ecd529c13d80cd8aa3f53ce03e79c5",
+      "created": "2026-05-12T10:18:00.000Z",
+      "updated": "2026-05-20T10:09:00.000Z"
+    },
     {
       "id": "35acd529-c13d-80f2-8296-d3ef8b8e29dc",
       "title": "D-12",
