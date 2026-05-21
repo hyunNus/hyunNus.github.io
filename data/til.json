@@ -1,7 +1,21 @@
 {
-  "lastSync": "2026-05-21T06:39:13.116Z",
-  "count": 16,
+  "lastSync": "2026-05-21T11:58:49.636Z",
+  "count": 17,
   "items": [
+    {
+      "id": "367cd529-c13d-8047-8aed-f35904141f25",
+      "title": "D-16",
+      "category": "DEV",
+      "tags": [
+        "LLM"
+      ],
+      "date": "2026-05-21",
+      "summary": "나도 이제 카드 찍어준다",
+      "content": "- 새로운 OCR task 부여 \n- OCR 모델 리서치 \n- 라이센스 이슈 발생 \n- Qwen test\n- Code refactoring \n- Git repo and 협업 \n-",
+      "url": "https://www.notion.so/D-16-367cd529c13d80478aedf35904141f25",
+      "created": "2026-05-21T11:06:00.000Z",
+      "updated": "2026-05-21T11:07:00.000Z"
+    },
     {
       "id": "366cd529-c13d-8082-be46-ff4bf4596aa2",
       "title": "D-15",
