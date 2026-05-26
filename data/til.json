@@ -1,7 +1,21 @@
 {
-  "lastSync": "2026-05-26T06:34:41.442Z",
-  "count": 17,
+  "lastSync": "2026-05-26T14:28:58.960Z",
+  "count": 18,
   "items": [
+    {
+      "id": "36ccd529-c13d-80c3-9603-cce397dcbe50",
+      "title": "Long time no see",
+      "category": "DEV",
+      "tags": [
+        "Python"
+      ],
+      "date": "2026-05-26",
+      "summary": ":)",
+      "content": "- Model come!!!! \n- Model rapper refactor and modularization\n- Went hospital \n- Tax study \n- Ai idea contest submit complete",
+      "url": "https://www.notion.so/Long-time-no-see-36ccd529c13d80c39603cce397dcbe50",
+      "created": "2026-05-26T11:01:00.000Z",
+      "updated": "2026-05-26T11:04:00.000Z"
+    },
     {
       "id": "367cd529-c13d-8047-8aed-f35904141f25",
       "title": "D-16",
